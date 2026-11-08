@@ -1,0 +1,2381 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Essence Dispo : prix de l’essence, du gasoil et stations à sec autour de toi, en direct, avec les données officielles.">
+<meta name="theme-color" content="#1A4EA6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E2B66" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Essence Dispo">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='10' fill='%23F5C400'/%3E%3Cpath d='M20 7.5c0 0-8.5 9.6-8.5 15.4a8.5 8.5 0 0 0 17 0C28.5 17.1 20 7.5 20 7.5z' fill='%231A4EA6'/%3E%3C/svg%3E">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Essence Dispo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: une console de conducteur sur une colonne — bandeau bleu « panneau routier » avec recherche et choix du carburant,
+   le totem LED ambre comme seul objet fort, puis chiffres clés et liste au pouce ; radar 3D et communauté en onglets voisins. */
+:root{
+  --bg:#EDF1F7;--surface:#FFFFFF;--surface-2:#E2E8F2;--line:#D0D9E8;
+  --ink:#0C1932;--ink-2:#46577A;--ink-3:#7484A5;
+  --band:#1A4EA6;--band-2:#133E8C;--on-band:#FFFFFF;
+  --sign:#1A4EA6;--on-sign:#FFFFFF;
+  --signal:#F5C400;--on-signal:#171300;
+  --panel:#0A1530;--panel-2:#152851;--led:#FFB01F;
+  --ok:#0E8747;--ok-bg:#DCF1E5;--bad:#C42B23;--bad-bg:#FBE3E1;--warn:#935500;--warn-bg:#FFEEC4;
+  --shadow:0 1px 2px rgba(12,25,50,.06),0 10px 28px rgba(12,25,50,.10);
+  --font-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --font-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r-lg:22px;--r-md:16px;--r-sm:11px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#07112A;--surface:#0E1B39;--surface-2:#152649;--line:#22365F;
+  --ink:#E8EEF9;--ink-2:#A2B2D1;--ink-3:#7686A9;
+  --band:#0E2B66;--band-2:#0A2254;--on-band:#FFFFFF;
+  --sign:#7EA6FF;--on-sign:#06112B;
+  --signal:#F7CB2A;--on-signal:#171300;
+  --panel:#040B1C;--panel-2:#0E1C3D;--led:#FFB01F;
+  --ok:#46CF8A;--ok-bg:rgba(70,207,138,.14);--bad:#FF7B6F;--bad-bg:rgba(255,123,111,.15);--warn:#F3BD55;--warn-bg:rgba(243,189,85,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.4);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#07112A;--surface:#0E1B39;--surface-2:#152649;--line:#22365F;
+  --ink:#E8EEF9;--ink-2:#A2B2D1;--ink-3:#7686A9;
+  --band:#0E2B66;--band-2:#0A2254;--on-band:#FFFFFF;
+  --sign:#7EA6FF;--on-sign:#06112B;
+  --signal:#F7CB2A;--on-signal:#171300;
+  --panel:#040B1C;--panel-2:#0E1C3D;--led:#FFB01F;
+  --ok:#46CF8A;--ok-bg:rgba(70,207,138,.14);--bad:#FF7B6F;--bad-bg:rgba(255,123,111,.15);--warn:#F3BD55;--warn-bg:rgba(243,189,85,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--band)}
+body.locked{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{cursor:not-allowed;opacity:.55}
+a{color:var(--sign)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+h1,h2,h3{text-wrap:balance}
+.wrap{width:100%;max-width:700px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.ic{width:20px;height:20px;flex:none}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- barre du haut ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--band);color:var(--on-band);box-shadow:0 1px 0 rgba(255,255,255,.08),0 10px 22px -8px rgba(4,12,30,.45)}
+.top .wrap{display:flex;align-items:center;gap:8px;min-height:58px;padding-block:6px}
+.brand{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;text-decoration:none;color:inherit;overflow:hidden}
+.logo{width:36px;height:36px;flex:none}
+.logo .bg{fill:var(--signal)} .logo .drop{fill:var(--band)} .logo .tick{fill:none;stroke:var(--signal);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.brand b{font-family:var(--font-display);font-weight:700;font-size:25px;letter-spacing:.02em;line-height:1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.brand b span{color:var(--signal)}
+.live{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 13px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:inherit;font-size:14px;font-weight:700;white-space:nowrap}
+.live .dot{width:9px;height:9px;border-radius:50%;background:#46CF8A;animation:ping 2.2s infinite}
+.live[data-state="demo"] .dot{background:var(--signal);animation:none}
+.live[data-state="error"] .dot{background:#FF7B6F;animation:none}
+.live[data-state="loading"] .dot,.live[data-state="boot"] .dot{background:#fff;animation:blink 1s infinite}
+.icon-btn{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:12px;border:0;background:transparent;color:inherit;flex:none}
+.icon-btn:hover{background:rgba(127,127,127,.12)}
+.icon-btn .ic{width:22px;height:22px}
+
+/* ---------- bandeau principal ---------- */
+.hero{position:relative;background:linear-gradient(180deg,var(--band) 0%,var(--band-2) 100%);color:var(--on-band);border-radius:0 0 30px 30px;padding-block:6px 28px;overflow:hidden}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:12px;height:3px;background:repeating-linear-gradient(90deg,rgba(245,196,0,.55) 0 26px,transparent 26px 46px);animation:lane 1.6s linear infinite}
+.hero-grid{display:grid;gap:14px}
+.banner{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;background:var(--signal);color:var(--on-signal);border-radius:14px;padding:10px 14px;font-size:15px;line-height:1.35}
+.banner b{font-family:var(--font-display);font-size:18px;text-transform:uppercase;letter-spacing:.04em}
+.banner .link{color:var(--on-signal)}
+.locate{display:flex;gap:10px}
+.gps{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 16px;border:0;border-radius:14px;background:var(--signal);color:var(--on-signal);font-weight:700;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .15s var(--ease)}
+.gps:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.gps[aria-busy="true"] .ic{animation:spin 1s linear infinite}
+.search{position:relative;flex:1;min-width:0}
+.search input{width:100%;min-height:50px;padding:0 14px 0 42px;border-radius:14px;border:2px solid transparent;background:#fff;color:#0C1932;font-size:16px}
+.search input::placeholder{color:#6B7A99}
+.search input:focus{outline:none;border-color:var(--signal)}
+.search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#46577A;pointer-events:none}
+.suggest{position:absolute;z-index:40;left:0;right:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:var(--surface);color:var(--ink);border-radius:14px;box-shadow:var(--shadow);border:1px solid var(--line);max-height:290px;overflow:auto}
+.suggest li{padding:11px 12px;border-radius:10px;cursor:pointer;line-height:1.3}
+.suggest li small{display:block;color:var(--ink-3);font-size:13px}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--surface-2)}
+.place{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0;font-size:15px;color:rgba(255,255,255,.9)}
+.place .ic{width:18px;height:18px}
+.place em{font-style:normal;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.14)}
+.place strong{color:#fff}
+.radius{appearance:none;-webkit-appearance:none;min-height:34px;padding:0 28px 0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 11px center;color:#fff;font-weight:700;font-size:14px}
+.radius option{color:#0C1932}
+.fuels{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.fuels::-webkit-scrollbar{display:none}
+.fuel{display:inline-flex;align-items:center;gap:8px;flex:none;min-height:46px;padding:0 14px 0 8px;border-radius:999px;border:1.5px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-weight:700;scroll-snap-align:start;transition:background .2s,color .2s,transform .2s var(--ease)}
+.fuel .eu{width:30px;height:30px}
+.fuel[aria-checked="true"]{background:#fff;color:#0C1932;border-color:#fff;transform:translateY(-1px)}
+
+/* ---------- totem LED ---------- */
+.totem-stage{perspective:1000px}
+.totem-tilt{transition:transform .5s var(--ease);transform-style:preserve-3d}
+.totem{position:relative;display:block;width:100%;padding:0;border:0;text-align:left;color:#fff;background:linear-gradient(180deg,var(--panel-2),var(--panel));border-radius:20px;box-shadow:0 2px 0 rgba(255,255,255,.08) inset,0 18px 40px rgba(2,8,24,.45),0 0 0 1px rgba(255,255,255,.06);overflow:hidden;transform-style:preserve-3d;animation:float 7s ease-in-out infinite}
+.totem::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.09) 48%,transparent 60%);background-size:260% 100%;animation:shine 7s var(--ease) infinite;pointer-events:none}
+.totem-top{display:flex;align-items:center;gap:10px;background:#fff;color:#0C1932;padding:8px 14px}
+.totem-top .eu{width:30px;height:30px}
+.totem-top .fname{font-family:var(--font-display);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.03em;line-height:1}
+.totem-top .tag{margin-left:auto;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#46577A;text-align:right}
+.totem-led{display:flex;align-items:flex-end;gap:10px;padding:12px 16px 4px}
+.seg{width:min(62vw,232px);height:auto;flex:none;filter:drop-shadow(0 0 7px rgba(255,176,31,.55))}
+.seg polygon,.seg rect{fill:var(--led);opacity:.08;transition:opacity .18s}
+.seg .on{opacity:1}
+.totem-unit{font-family:var(--font-display);font-weight:600;font-size:22px;color:var(--led);opacity:.9;padding-bottom:6px}
+.totem-foot{display:flex;align-items:center;gap:8px;padding:4px 16px 12px;font-size:15px;color:#C9D6F2;min-height:44px}
+.totem-foot .ic{color:var(--led)}
+.totem-foot b{color:#fff}
+
+/* ---------- chiffres clés ---------- */
+main{padding-block:16px 28px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 8px 8px;text-align:center;min-width:0}
+.stat b{display:block;font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:4px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.stat.ok b{color:var(--ok)} .stat.bad b{color:var(--bad)}
+.meter{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--surface-2);margin-top:10px}
+.meter i{display:block;height:100%;width:0;transition:width .6s var(--ease)}
+.meter .m-ok{background:var(--ok)} .meter .m-stale{background:var(--warn)} .meter .m-dry{background:var(--bad)}
+.meter-note{margin:6px 0 0;font-size:13px;color:var(--ink-3)}
+
+/* ---------- onglets ---------- */
+.tabs{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;padding:4px;border-radius:16px;background:var(--surface-2)}
+.tabs [role="tab"]{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;border:0;border-radius:12px;background:transparent;color:var(--ink-2);font-weight:700;font-size:15px;transition:color .2s}
+.tabs [role="tab"][aria-selected="true"]{color:var(--ink)}
+.tab-ind{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:12px;background:var(--surface);box-shadow:0 1px 3px rgba(12,25,50,.12);transition:transform .35s var(--ease)}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--bad);color:#fff;font-size:12px;font-weight:700}
+.panel{padding-top:14px}
+
+/* ---------- liste ---------- */
+.tools{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.tools .chip{flex:none}
+.seg-ctl{display:inline-flex;padding:3px;border-radius:12px;background:var(--surface-2);gap:2px;max-width:100%;min-width:0;overflow-x:auto;scrollbar-width:none}
+.seg-ctl button{min-height:38px;padding:0 12px;border:0;border-radius:9px;background:transparent;color:var(--ink-2);font-weight:700;font-size:14px;white-space:nowrap}
+.seg-ctl button[aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(12,25,50,.12)}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-weight:700;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .ic{width:17px;height:17px}
+.hint{margin:10px 0 12px;font-size:14px;color:var(--ink-3)}
+.link{border:0;background:none;padding:0;color:var(--sign);font-weight:700;text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:10px;perspective:1200px}
+.st{position:relative;display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;width:100%;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);text-align:left;color:var(--ink);animation:rise .5s var(--ease) backwards;animation-delay:calc(min(var(--i,0),10) * 40ms);transition:transform .2s var(--ease),box-shadow .2s,border-color .2s}
+.st:hover{box-shadow:var(--shadow);border-color:transparent}
+.st:active{transform:scale(.985)}
+.st.is-best{border:2px solid var(--signal);padding:13px}
+.flag{position:absolute;top:-10px;right:12px;background:var(--signal);color:var(--on-signal);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:3px 8px;border-radius:6px}
+.st-price{display:grid;justify-items:start;gap:2px;min-width:0}
+.st-price .p{font-family:var(--font-display);font-weight:700;font-size:32px;line-height:.95;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.st-price .p small{font-size:.58em;vertical-align:.55em;margin-left:1px}
+.st-price .p.dry{font-size:24px;color:var(--bad);text-transform:uppercase}
+.st-price .p.na{color:var(--ink-3)}
+.st-price .u{font-size:12px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.st-main{display:block;min-width:0}
+.st-name{display:flex;align-items:center;gap:6px;font-weight:700;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+.st-name .ic{width:16px;height:16px;color:var(--signal);fill:var(--signal)}
+.st-sub{display:block;margin-top:2px;font-size:14px;color:var(--ink-2)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:700;line-height:1.2}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.neutral{background:var(--surface-2);color:var(--ink-2)}
+.pill.save{background:transparent;color:var(--ok);padding-left:0} .pill.save::before{display:none}
+.pill.comm{background:transparent;border:1.5px dashed currentColor}
+.list.still .st{animation:none}
+.btn .ic{width:19px;height:19px}
+.sk{height:96px;border-radius:var(--r-md);background:linear-gradient(90deg,var(--surface) 0%,var(--surface-2) 50%,var(--surface) 100%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border:1px solid var(--line)}
+.empty{padding:28px 20px;text-align:center;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r-md);color:var(--ink-2)}
+.empty h3{margin:0 0 6px;color:var(--ink);font-size:18px}
+.empty p{margin:0 auto 14px;max-width:42ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;text-decoration:none;font-size:15px}
+.btn.primary{background:var(--sign);border-color:var(--sign);color:var(--on-sign)}
+.btn.yellow{background:var(--signal);border-color:var(--signal);color:var(--on-signal)}
+.btn.small{min-height:40px;padding:0 13px;font-size:14px}
+.more{width:100%;margin-top:12px}
+
+/* ---------- radar 3D ---------- */
+.radar{position:relative;height:min(62vh,460px);min-height:320px;border-radius:var(--r-lg);overflow:hidden;background:radial-gradient(120% 90% at 50% 35%,var(--surface) 0%,var(--surface-2) 75%);border:1px solid var(--line);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.radar canvas{display:block;width:100%;height:100%;cursor:grab}
+.radar canvas:active{cursor:grabbing}
+.radar-ctl{position:absolute;right:10px;top:10px;display:grid;gap:6px}
+.radar-ctl button{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 2px 6px rgba(12,25,50,.12)}
+.radar-msg{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-2)}
+.radar-hint{position:absolute;left:12px;bottom:10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 2px 0;font-size:14px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.pick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;align-items:center;margin-top:12px;padding:14px;border-radius:var(--r-md);background:var(--surface);border:2px solid var(--signal);animation:rise .35s var(--ease) backwards}
+.pick b{display:block}
+.pick span{display:block;color:var(--ink-2);font-size:14px}
+.pick .pp{font-family:var(--font-display);font-weight:700;font-size:30px;line-height:1;text-align:right}
+.pick .btn{grid-column:1/-1}
+
+/* ---------- communauté ---------- */
+.chat-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
+.chat-head h2{margin:0;font-family:var(--font-display);font-size:26px;text-transform:uppercase;letter-spacing:.02em;line-height:1}
+.chat-state{margin:4px 0 0;font-size:14px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.chat-state i{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.chat-state[data-s="live"] i{background:var(--ok);animation:ping 2.2s infinite}
+.chat-state[data-s="error"] i,.chat-state[data-s="unavailable"] i{background:var(--bad)}
+.msgs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.msg{display:flex}
+.msg.mine{justify-content:flex-end}
+.bubble{max-width:min(86%,520px);padding:10px 12px 11px;border-radius:16px 16px 16px 6px;background:var(--surface);border:1px solid var(--line);min-width:0}
+.msg.mine .bubble{border-radius:16px 16px 6px 16px;background:var(--sign);border-color:var(--sign);color:var(--on-sign)}
+.meta{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-3);margin-bottom:3px}
+.msg.mine .meta{color:inherit;opacity:.8}
+.meta b{color:var(--ink);font-size:14px}
+.msg.mine .meta b{color:inherit}
+.meta .mini{margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:inherit;opacity:.7}
+.meta .mini .ic{width:16px;height:16px}
+.bubble p{margin:2px 0 0;overflow-wrap:anywhere}
+.bubble .pill{margin-top:2px}
+.msg.mine .bubble .pill{background:rgba(255,255,255,.92)}
+.stag{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px 4px 7px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font-size:13px;font-weight:700;opacity:.9;max-width:100%}
+.stag .ic{width:15px;height:15px}
+.stag span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mstate{display:block;margin-top:6px;font-size:12px;opacity:.8}
+.mstate.err{border:0;background:none;padding:0;color:inherit;text-decoration:underline;font-weight:700}
+.msg.hidden .bubble{background:transparent;border-style:dashed;color:var(--ink-3)}
+.msg.hidden button{border:0;background:none;color:inherit;padding:0;font-size:14px}
+.composer{position:sticky;bottom:0;z-index:5;margin-top:14px;padding:10px 0 max(10px,env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent,var(--bg) 22%)}
+.composer-in{display:grid;gap:8px;padding:10px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.crow{display:flex;gap:8px}
+.crow input{flex:1;min-width:0;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:16px}
+.crow input:focus{outline:none;border-color:var(--sign)}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px;color:var(--ink-2)}
+.who .ic{width:17px;height:17px}
+.who input{flex:1;min-width:0;min-height:42px;padding:0 12px;border-radius:11px;border:1px solid var(--line);background:var(--bg);font-size:16px}
+.who input:focus{outline:none;border-color:var(--sign)}
+.attach{flex-wrap:wrap}
+.attach .icon-btn{width:36px;height:36px;margin-left:auto}
+.attach .quick{flex-basis:100%}
+.attach{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink-2)}
+.attach .stag{margin:0;color:var(--sign)}
+.quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.quick button{flex:none;min-height:34px;padding:0 11px;border-radius:999px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:700;color:var(--ink-2)}
+.fine{margin:6px 0 0;font-size:13px;color:var(--ink-3)}
+
+/* ---------- fiche station / réglages ---------- */
+.backdrop{position:fixed;inset:0;z-index:80;background:rgba(5,12,30,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fade .25s var(--ease)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:90;width:min(700px,100%);margin:0 auto;max-height:90vh;max-height:90dvh;overflow:auto;overscroll-behavior:contain;background:var(--surface);color:var(--ink);border-radius:26px 26px 0 0;box-shadow:0 -12px 44px rgba(5,12,30,.32);animation:sheetIn .4s var(--ease)}
+.sheet.closing{animation:sheetOut .22s ease-in forwards}
+.backdrop.closing{animation:fadeOut .22s ease-in forwards}
+@media (min-width:760px){.sheet{bottom:24px;border-radius:26px;max-height:calc(100dvh - 48px)}}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:10px auto 2px}
+.sheet-body{padding:6px max(18px,env(safe-area-inset-right,0px)) max(22px,env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+.sh-head{display:flex;align-items:flex-start;gap:10px}
+.sh-head h2{margin:6px 0 2px;font-size:22px;line-height:1.2;overflow-wrap:anywhere}
+.sh-head p{margin:0;color:var(--ink-2);font-size:15px}
+.sh-title{flex:1;min-width:0}
+.sh-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:14px 0 4px;padding:14px 16px;border-radius:var(--r-md);background:var(--panel);color:#fff}
+.sh-price .big{font-family:var(--font-display);font-weight:700;font-size:46px;line-height:1;color:var(--led);font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(255,176,31,.45)}
+.sh-price .big small{font-size:.55em;vertical-align:.7em}
+.sh-price.dry .big{color:#FF7B6F;text-shadow:none;text-transform:uppercase}
+.sh-price.na .big{color:#9fb0cf;text-shadow:none}
+.sh-price > span:last-child{color:#C9D6F2;font-size:15px}
+.sh-status{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.sh-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.sh-actions .btn{padding:0 8px}
+.sh-actions .btn[aria-pressed="true"] .ic{fill:var(--signal);color:var(--signal)}
+.navs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.sh-sec{margin-top:22px}
+.sh-sec h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.report{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rep{display:grid;justify-items:center;gap:6px;min-height:76px;padding:10px 6px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;line-height:1.2;text-align:center;transition:transform .15s var(--ease)}
+.rep:active{transform:scale(.96)}
+.rep .ic{width:24px;height:24px}
+.rep.ok{color:var(--ok)} .rep.bad{color:var(--bad)} .rep.warn{color:var(--warn)}
+.rep.ok:hover{background:var(--ok-bg)} .rep.bad:hover{background:var(--bad-bg)} .rep.warn:hover{background:var(--warn-bg)}
+.reports{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;font-size:14px;color:var(--ink-2)}
+.fuel-rows{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.fr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.fr:last-child{border-bottom:0}
+.fr .eu{width:28px;height:28px;color:var(--ink-2)}
+.fr .fn{font-weight:700}
+.fr .fv{font-family:var(--font-display);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums;text-align:right}
+.fr .fw{grid-column:2/-1;font-size:13px;color:var(--ink-3);margin-top:-4px}
+.fr.dry .fv{color:var(--bad);font-size:17px;text-transform:uppercase}
+.fr.stale .fv{color:var(--warn)}
+.fr.cur{background:linear-gradient(90deg,var(--surface-2),transparent);border-radius:10px;padding-left:6px;margin-left:-6px}
+.infos{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.infos li{display:flex;align-items:center;gap:10px}
+.infos .ic{color:var(--ink-3)}
+.svc{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.svc span{padding:4px 10px;border-radius:999px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.field{display:grid;gap:6px;font-size:14px;font-weight:700;color:var(--ink-2)}
+.field input{min-height:46px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-size:16px;font-weight:400;color:var(--ink);width:100%}
+.switch{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:700}
+.switch input{width:22px;height:22px;accent-color:var(--sign)}
+.steps{margin:0;padding-left:22px;display:grid;gap:10px}
+.steps li::marker{font-family:var(--font-display);font-weight:700;color:var(--sign)}
+
+/* ---------- pied de page, toast ---------- */
+.foot{padding-block:8px 34px;font-size:13px;color:var(--ink-3)}
+.foot p{margin:0 0 6px;max-width:68ch}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:120;width:max-content;max-width:calc(100% - 32px);transform:translateX(-50%);padding:12px 16px;border-radius:14px;background:var(--ink);color:var(--bg);font-weight:700;font-size:15px;box-shadow:var(--shadow);animation:toastIn .3s var(--ease)}
+
+@media (min-width:760px){
+  .hero-grid{grid-template-columns:minmax(0,1fr) 330px;align-items:start;column-gap:22px}
+  .hero-grid > .banner{grid-column:1/-1}
+  .hero-left{display:grid;gap:14px;align-content:start}
+  .totem-stage{grid-row:span 3}
+}
+@media (max-width:759px){.hero-left{display:contents}}
+@media (max-width:440px){
+  .live .lx,.chip .fav-txt{display:none}
+  .chip{padding:0 11px}
+  .brand{gap:8px}
+  .brand b{font-size:20px;letter-spacing:0}
+  .logo{width:32px;height:32px}
+  .seg-ctl button{padding:0 10px}
+}
+@media (max-width:380px){
+  .st{grid-template-columns:80px minmax(0,1fr)}
+  .st-price .p{font-size:27px}
+  .stat b{font-size:24px}
+  .gps span{display:none}
+}
+
+@keyframes rise{from{transform:translateY(14px) rotateX(-10deg);opacity:.35}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(70,207,138,.55)}80%,100%{box-shadow:0 0 0 9px rgba(70,207,138,0)}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes lane{to{background-position:46px 0}}
+@keyframes float{0%,100%{transform:rotateX(3deg) rotateY(-6deg) translateY(0)}50%{transform:rotateX(5deg) rotateY(-2deg) translateY(-4px)}}
+@keyframes shine{0%,62%{background-position:160% 0}100%{background-position:-60% 0}}
+@keyframes sheetIn{from{transform:translateY(100%)}}
+@keyframes sheetOut{to{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+@keyframes fadeOut{to{opacity:0}}
+@keyframes toastIn{from{transform:translate(-50%,16px);opacity:0}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Essence Dispo, accueil">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><rect class="bg" x="2" y="2" width="36" height="36" rx="10"/><path class="drop" d="M20 7.5c0 0-8.5 9.6-8.5 15.4a8.5 8.5 0 0 0 17 0C28.5 17.1 20 7.5 20 7.5z"/><path class="tick" d="M16.1 23.2l2.8 2.8 5.2-5.6"/></svg>
+      <b>Essence<span>Dispo</span></b>
+    </a>
+    <button type="button" class="live" id="liveBtn" data-state="boot" aria-label="État des données">
+      <span class="dot" aria-hidden="true"></span><span id="liveText">Chargement…</span>
+    </button>
+    <button type="button" class="icon-btn" id="settingsBtn" aria-label="Réglages">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="hero" aria-label="Recherche et meilleur prix">
+  <div class="wrap hero-grid">
+    <div class="banner" id="demoBanner" hidden>
+      <b>Aperçu</b>
+      <span>Stations et prix d’exemple. En ligne, l’appli affiche les vrais prix et ruptures autour de toi, avec ton GPS.</span>
+      <button type="button" class="link" data-open="help">Comment la mettre en ligne ?</button>
+    </div>
+    <div class="hero-left">
+      <div class="locate">
+        <button type="button" class="gps" id="gpsBtn" aria-label="Me localiser">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          <span>Autour de moi</span>
+        </button>
+        <form class="search" id="searchForm" role="search" autocomplete="off">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+          <label class="vh" for="searchInput">Ville, adresse ou code postal</label>
+          <input id="searchInput" type="search" enterkeyhint="search" placeholder="Ville, adresse, code postal" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+          <ul class="suggest" id="suggest" role="listbox" aria-label="Suggestions" hidden></ul>
+        </form>
+      </div>
+      <p class="place">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>
+        <span id="placeName"><strong>Localisation…</strong></span>
+        <label class="vh" for="radiusSel">Rayon de recherche</label>
+        <select class="radius" id="radiusSel">
+          <option value="5">5 km</option><option value="10" selected>10 km</option><option value="20">20 km</option><option value="30">30 km</option>
+        </select>
+      </p>
+      <div class="fuels" id="fuelBar" role="radiogroup" aria-label="Carburant"></div>
+    </div>
+
+    <div class="totem-stage">
+      <div class="totem-tilt" id="totemTilt">
+        <button type="button" class="totem" id="totem" aria-label="Meilleur prix disponible">
+          <span class="totem-top"><span id="totemEu"></span><span class="fname" id="totemFuel">Gazole</span><span class="tag" id="totemTag">Meilleur prix dispo</span></span>
+          <span class="totem-led"><span id="segWrap"></span><span class="totem-unit">€/L</span></span>
+          <span class="totem-foot" id="totemFoot">Recherche des stations…</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="stats" aria-label="Résumé de la zone">
+    <div class="stat"><b id="stTotal">–</b><span>Stations</span></div>
+    <div class="stat ok"><b id="stOk">–</b><span>Dispo</span></div>
+    <div class="stat bad"><b id="stDry">–</b><span>À sec</span></div>
+    <div class="stat"><b id="stAvg">–</b><span>Moy. €/L</span></div>
+  </div>
+  <div class="meter" aria-hidden="true"><i class="m-ok" id="mOk"></i><i class="m-stale" id="mStale"></i><i class="m-dry" id="mDry"></i></div>
+  <p class="meter-note" id="meterNote"></p>
+
+  <div class="tabs" role="tablist" aria-label="Affichage">
+    <button type="button" role="tab" id="tab-list" aria-controls="panel-list" aria-selected="true">Stations</button>
+    <button type="button" role="tab" id="tab-radar" aria-controls="panel-radar" aria-selected="false" tabindex="-1">Radar 3D</button>
+    <button type="button" role="tab" id="tab-chat" aria-controls="panel-chat" aria-selected="false" tabindex="-1">Communauté <span class="badge" id="chatBadge" hidden>0</span></button>
+    <span class="tab-ind" id="tabInd" aria-hidden="true"></span>
+  </div>
+
+  <section class="panel" id="panel-list" role="tabpanel" aria-labelledby="tab-list">
+    <div class="tools">
+      <div class="seg-ctl" role="radiogroup" aria-label="Trier par" id="sortCtl">
+        <button type="button" role="radio" data-sort="best" aria-checked="true">Meilleur choix</button>
+        <button type="button" role="radio" data-sort="price" aria-checked="false">Prix</button>
+        <button type="button" role="radio" data-sort="dist" aria-checked="false">Distance</button>
+      </div>
+      <button type="button" class="chip" id="favToggle" aria-pressed="false" aria-label="Afficher seulement mes favoris">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg>
+        <span class="fav-txt">Favoris</span>
+      </button>
+    </div>
+    <p class="hint" id="sortHint"></p>
+    <ol class="list" id="list" aria-live="polite">
+      <li class="sk"></li><li class="sk"></li><li class="sk"></li><li class="sk"></li>
+    </ol>
+    <button type="button" class="btn more" id="moreBtn" hidden>Afficher plus de stations</button>
+  </section>
+
+  <section class="panel" id="panel-radar" role="tabpanel" aria-labelledby="tab-radar" hidden>
+    <div class="radar" id="radar">
+      <canvas id="radarCanvas" role="img" aria-label="Radar 3D des stations autour de toi"></canvas>
+      <div class="radar-ctl">
+        <button type="button" data-radar="in" aria-label="Rapprocher"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" data-radar="out" aria-label="Éloigner"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+        <button type="button" data-radar="view" aria-label="Changer d’angle de vue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></button>
+        <button type="button" data-radar="reset" aria-label="Recentrer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+      <div class="radar-msg" id="radarMsg" hidden></div>
+      <span class="radar-hint" aria-hidden="true">Glisse pour tourner · touche une colonne</span>
+    </div>
+    <div class="legend" aria-label="Légende">
+      <span><i style="background:var(--ok)"></i>Dispo</span>
+      <span><i style="background:var(--warn)"></i>Prix ancien</span>
+      <span><i style="background:var(--bad)"></i>À sec</span>
+      <span><i style="background:var(--sign);border-radius:50%"></i>Toi, au centre</span>
+      <span>Plus la colonne est haute, moins c’est cher</span>
+    </div>
+    <div id="radarPick"></div>
+  </section>
+
+  <section class="panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat" hidden>
+    <div class="chat-head">
+      <div>
+        <h2>Communauté</h2>
+        <p class="chat-state" id="chatState" data-s="connecting"><i aria-hidden="true"></i><span>Connexion…</span></p>
+      </div>
+      <div class="seg-ctl" role="radiogroup" aria-label="Messages affichés" id="chatFilter">
+        <button type="button" role="radio" data-cf="near" aria-checked="true">Près de moi</button>
+        <button type="button" role="radio" data-cf="all" aria-checked="false">Tout</button>
+      </div>
+    </div>
+    <ol class="msgs" id="msgs" aria-live="polite"></ol>
+    <form class="composer" id="composer" autocomplete="off">
+      <div class="composer-in">
+        <div class="attach" id="attach" hidden></div>
+        <div class="who" id="who"></div>
+        <div class="crow">
+          <label class="vh" for="msgInput">Ton message</label>
+          <input id="msgInput" maxlength="280" enterkeyhint="send" placeholder="Écris aux conducteurs du coin…">
+          <button type="submit" class="btn primary" id="sendBtn" aria-label="Envoyer">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m4 12 16-8-6 16-2.5-6.5z"/></svg>
+          </button>
+        </div>
+        <p class="fine" id="chatFine">Messages publics, visibles quelques heures. Ne partage pas d’informations personnelles.</p>
+      </div>
+    </form>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <p>Prix et ruptures : flux officiel « Prix des carburants » du Ministère de l’Économie, mis à jour toutes les 10 minutes (Licence Ouverte 2.0). Les ruptures sont déclarées par les stations elles-mêmes ; les signalements de la communauté ne sont pas vérifiés.</p>
+  <p>Essence Dispo · version 1.2</p>
+</footer>
+
+<div class="backdrop" id="backdrop" hidden></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-body" id="sheetBody"></div>
+</section>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+/* Essence Dispo — logique pure (sans DOM), testable hors navigateur. */
+(function (root) {
+  'use strict';
+
+  var MIN = 6e4, HOUR = 36e5, DAY = 864e5;
+  var STALE_MS = 48 * HOUR;   // au-delà, le prix est signalé « ancien »
+  var COMM_MS = 3 * HOUR;     // durée de vie d'un signalement communautaire
+
+  var FUELS = [
+    { key: 'gazole', name: 'Gazole', short: 'Gazole', eu: 'B7', shape: 'square', alias: ['gazole', 'b7', 'diesel'] },
+    { key: 'e10', name: 'SP95-E10', short: 'E10', eu: 'E10', shape: 'circle', alias: ['e10', 'sp95e10'] },
+    { key: 'sp98', name: 'SP98', short: 'SP98', eu: 'E5', shape: 'circle', alias: ['sp98'] },
+    { key: 'sp95', name: 'SP95', short: 'SP95', eu: 'E5', shape: 'circle', alias: ['sp95'] },
+    { key: 'e85', name: 'E85', short: 'E85', eu: 'E85', shape: 'circle', alias: ['e85'] },
+    { key: 'gplc', name: 'GPLc', short: 'GPLc', eu: 'LPG', shape: 'diamond', alias: ['gplc', 'gpl', 'lpg'] }
+  ];
+  var FUEL = {};
+  FUELS.forEach(function (f) { FUEL[f.key] = f; });
+
+  var RANK = { ok: 0, stale: 1, noprice: 2, dry: 3 };
+  var SEGMAP = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
+
+  /* ---------- petits outils ---------- */
+  function nrm(s) {
+    return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+  }
+  function toNum(v) {
+    if (v == null || v === '') return null;
+    var n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
+    return isFinite(n) ? n : null;
+  }
+  function toTime(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return v > 1e12 ? v : v * 1000;
+    var t = Date.parse(String(v).trim().replace(' ', 'T'));
+    return isFinite(t) ? t : null;
+  }
+  function parseJSONish(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'object') return v;
+    try { return JSON.parse(String(v)); } catch (e) { return null; }
+  }
+  function toList(v, sep) {
+    if (v == null) return [];
+    if (Array.isArray(v)) return v.reduce(function (a, x) { return a.concat(toList(x, sep)); }, []);
+    if (typeof v === 'object') return [];
+    var s = String(v).trim();
+    if (!s) return [];
+    if (s.charAt(0) === '[') {
+      var j = parseJSONish(s);
+      if (Array.isArray(j)) return toList(j, sep);
+    }
+    return s.split(sep || /\s*(?:\/\/|;|,|\|)\s*/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+
+  var SMALL = { de: 1, du: 1, des: 1, la: 1, le: 1, les: 1, et: 1, a: 1, 'à': 1, au: 1, aux: 1, sur: 1, en: 1, d: 1, l: 1, sous: 1, 'lès': 1, par: 1 };
+  var KEEP = { za: 1, zi: 1, zac: 1, zc: 1, zae: 1, rn: 1, rd: 1, cd: 1, cc: 1, zup: 1, bp: 1, cedex: 1, ii: 1, iii: 1 };
+  /* « 12 AVENUE JEAN JAURES » → « 12 Avenue Jean Jaures » (seulement si tout est en majuscules) */
+  function titleCase(s) {
+    s = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+    if (!s || s !== s.toUpperCase() || !/[A-Z]/.test(s)) return s;
+    var lower = s.toLowerCase();
+    return lower.replace(/[a-zà-öø-ÿ]+/g, function (w, i) {
+      var next = lower.charAt(i + w.length);
+      if (KEEP[w] || /\d/.test(next)) return w.toUpperCase();
+      if (i > 0 && SMALL[w]) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    });
+  }
+
+  /* ---------- lecture d'une station du flux officiel ---------- */
+  function readCoords(r) {
+    var lat = null, lon = null;
+    var g = r.geom != null ? r.geom : (r.geo_point != null ? r.geo_point : r.geo_point_2d);
+    if (Array.isArray(g) && g.length >= 2) { lat = toNum(g[0]); lon = toNum(g[1]); }
+    else if (g && typeof g === 'object') {
+      if (Array.isArray(g.coordinates)) { lon = toNum(g.coordinates[0]); lat = toNum(g.coordinates[1]); }
+      else { lat = toNum(g.lat != null ? g.lat : g.latitude); lon = toNum(g.lon != null ? g.lon : (g.lng != null ? g.lng : g.longitude)); }
+    } else if (typeof g === 'string' && g.indexOf(',') > 0) {
+      var p = g.split(','); lat = toNum(p[0]); lon = toNum(p[1]);
+    }
+    if (lat == null || lon == null) {
+      lat = toNum(r.latitude); lon = toNum(r.longitude);
+      if (lat != null && Math.abs(lat) > 90) lat /= 1e5;
+      if (lon != null && Math.abs(lon) > 180) lon /= 1e5;
+    }
+    if (lat == null || lon == null || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+    return { lat: lat, lon: lon };
+  }
+
+  function normalize(r, now) {
+    if (!r || typeof r !== 'object') return null;
+    if (r.fields && typeof r.fields === 'object' && r.adresse == null) {
+      r = Object.assign({}, r.fields, { id: r.fields.id != null ? r.fields.id : r.recordid });
+    }
+    var c = readCoords(r);
+    if (!c) return null;
+    now = now || Date.now();
+    var temp = toList(r.carburants_rupture_temporaire).map(nrm);
+    var def = toList(r.carburants_rupture_definitive).map(nrm);
+    var disp = toList(r.carburants_disponibles).map(nrm);
+    var indisp = toList(r.carburants_indisponibles).map(nrm);
+    var rupJ = [].concat(parseJSONish(r.rupture) || []).filter(function (o) { return o && typeof o === 'object'; });
+    var prixJ = [].concat(parseJSONish(r.prix) || []).filter(function (o) { return o && typeof o === 'object'; });
+    var nameOf = function (o) { return nrm(o['@nom'] != null ? o['@nom'] : o.nom); };
+    var fuels = {};
+    FUELS.forEach(function (F) {
+      var has = function (list) { return list.some(function (n) { return F.alias.indexOf(n) >= 0; }); };
+      var price = toNum(r[F.key + '_prix']);
+      var maj = toTime(r[F.key + '_maj']);
+      if (price == null) {
+        var pj = prixJ.filter(function (o) { return F.alias.indexOf(nameOf(o)) >= 0; })[0];
+        if (pj) {
+          price = toNum(pj['@valeur'] != null ? pj['@valeur'] : pj.valeur);
+          if (maj == null) maj = toTime(pj['@maj'] != null ? pj['@maj'] : pj.maj);
+        }
+      }
+      if (price != null && price > 10) price = price / 1000;          // ancien format en millièmes
+      if (price != null && (price < 0.3 || price > 5)) price = null;  // valeur aberrante
+      var rType = nrm(r[F.key + '_rupture_type']);
+      var rStart = toTime(r[F.key + '_rupture_debut']);
+      if (!rType) {
+        if (has(temp)) rType = 'temporaire';
+        else if (has(def)) rType = 'definitive';
+        else {
+          var j = rupJ.filter(function (o) { return F.alias.indexOf(nameOf(o)) >= 0; })[0];
+          if (j) {
+            var fin = toTime(j['@fin'] != null ? j['@fin'] : j.fin);
+            if (!fin || fin > now) {
+              rType = nrm(j['@type'] != null ? j['@type'] : j.type) || 'temporaire';
+              if (rStart == null) rStart = toTime(j['@debut'] != null ? j['@debut'] : j.debut);
+            }
+          }
+        }
+      }
+      if (rType.indexOf('temp') === 0) rType = 'temporaire';
+      else if (rType.indexOf('def') === 0) rType = 'definitive';
+      fuels[F.key] = { price: price, maj: maj, rType: rType, rStart: rStart, listed: has(disp), unlisted: has(indisp) };
+    });
+    var hoursJson = parseJSONish(r.horaires);
+    var name = String(r.nom || r.enseigne || r.marque || r.name || '').trim();
+    return {
+      id: String(r.id != null ? r.id : (c.lat.toFixed(5) + '_' + c.lon.toFixed(5))),
+      lat: c.lat, lon: c.lon,
+      name: titleCase(name),
+      adresse: titleCase(r.adresse || ''),
+      ville: titleCase(r.ville || ''),
+      cp: String(r.cp || '').trim(),
+      autoroute: String(r.pop || '').trim().toUpperCase() === 'A',
+      h24: /^(oui|1|true)$/i.test(String(r.horaires_automate_24_24 || '').trim()) ||
+        !!(hoursJson && typeof hoursJson === 'object' && String(hoursJson['@automate-24-24'] || '') === '1'),
+      services: toList(r.services_service, /\s*(?:\/\/|;|\|)\s*/).slice(0, 14),
+      hoursJson: hoursJson && typeof hoursJson === 'object' ? hoursJson : null,
+      hoursText: typeof r.horaires_jour === 'string' ? r.horaires_jour : '',
+      fuels: fuels
+    };
+  }
+
+  /* ok = prix récent · stale = prix vieux de plus de 48 h · dry = rupture temporaire
+     noprice = vendu mais sans prix · none = pas vendu ici */
+  function statusOf(f, now) {
+    if (!f) return 'none';
+    now = now || Date.now();
+    var hasP = f.price != null;
+    if (f.rType === 'temporaire' && (!hasP || !f.maj || !f.rStart || f.rStart >= f.maj)) return 'dry';
+    if (hasP) return (f.maj && now - f.maj > STALE_MS) ? 'stale' : 'ok';
+    if (f.rType === 'definitive') return 'none';
+    if (f.listed) return 'noprice';
+    return 'none';
+  }
+
+  function km(a, b) {
+    var R = 6371, toR = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * toR, dLon = (b.lon - a.lon) * toR;
+    var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+  }
+
+  var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  function hhmm(v) {
+    var m = String(v == null ? '' : v).match(/(\d{1,2})[.:h](\d{2})/);
+    return m ? (m[1].length < 2 ? '0' + m[1] : m[1]) + 'h' + m[2] : null;
+  }
+  function todayHours(st, date) {
+    var day = JOURS[(date || new Date()).getDay()];
+    var hj = st.hoursJson;
+    if (hj && hj.jour) {
+      var j = [].concat(hj.jour).filter(function (o) { return o && nrm(o['@nom'] || o.nom) === day; })[0];
+      if (j) {
+        if (String(j['@ferme'] || j.ferme || '') === '1') return 'fermé';
+        var ranges = [].concat(j.horaire || []).map(function (h) {
+          var a = hhmm(h && (h['@ouverture'] || h.ouverture)), b = hhmm(h && (h['@fermeture'] || h.fermeture));
+          return a && b ? a + '–' + b : null;
+        }).filter(Boolean);
+        if (ranges.length) return ranges.join(', ');
+      }
+    }
+    var t = st.hoursText ? String(st.hoursText) : '';
+    if (t) {
+      var re = new RegExp(day + '\\s*:?\\s*((?:\\d{1,2}[.:h]\\d{2}\\s*-\\s*\\d{1,2}[.:h]\\d{2}(?:\\s*(?:et|/)\\s*)?)+)', 'i');
+      var m = t.normalize('NFD').replace(/[̀-ͯ]/g, '').match(re);
+      if (m) {
+        return m[1].trim().split(/\s*(?:et|\/)\s*/).map(function (rg) {
+          var p = rg.split(/\s*-\s*/);
+          return hhmm(p[0]) + '–' + hhmm(p[1]);
+        }).join(', ');
+      }
+    }
+    return null;
+  }
+
+  /* ---------- vue calculée : filtre, coût réel du plein, tri ---------- */
+  function nz(v) { return v == null ? 1e9 : v; }
+  function sorter(kind) {
+    if (kind === 'price') return function (a, b) { return a.rank - b.rank || nz(a.price) - nz(b.price) || a.dist - b.dist; };
+    if (kind === 'dist') return function (a, b) { return a.dist - b.dist; };
+    return function (a, b) { return a.rank - b.rank || nz(a.cost) - nz(b.cost) || a.dist - b.dist; };
+  }
+  function computeView(stations, o, now, commFn) {
+    now = now || Date.now();
+    var rows = [];
+    stations.forEach(function (st) {
+      var f = st.fuels[o.fuel];
+      var status = statusOf(f, now);
+      if (status === 'none') return;
+      var dist = km(o.place, st);
+      if (dist > o.radius + 0.05) return;
+      rows.push({ st: st, f: f, status: status, dist: dist, price: (status === 'ok' || status === 'stale') ? f.price : null });
+    });
+    var okRows = rows.filter(function (r) { return r.status === 'ok'; });
+    var pool = okRows.length ? okRows : rows.filter(function (r) { return r.price != null; });
+    var avg = pool.length ? pool.reduce(function (a, r) { return a + r.price; }, 0) / pool.length : null;
+    var counts = { total: rows.length, ok: 0, stale: 0, dry: 0, noprice: 0 };
+    var minP = null, maxP = null;
+    rows.forEach(function (r) {
+      counts[r.status]++;
+      if (r.price != null) {
+        minP = minP == null ? r.price : Math.min(minP, r.price);
+        maxP = maxP == null ? r.price : Math.max(maxP, r.price);
+      }
+      r.cost = r.price != null ? r.price * (o.tank + r.dist * 2 * o.cons / 100) : null;
+      r.save = r.price != null && avg != null ? (avg - r.price) * o.tank : null;
+      r.comm = commFn ? commFn(r.st.id, o.fuel) : null;
+      r.rank = RANK[r.status];
+      if (r.comm) {
+        var officialAt = r.status === 'dry' ? (r.f.rStart || 0) : (r.f.maj || 0);
+        if (r.comm.at > officialAt) {
+          if (r.comm.s === 'dry' && r.rank < 2) r.rank = 1.6;          // la communauté le dit à sec
+          else if (r.comm.s === 'ok' && r.status === 'dry') r.rank = 2.4; // réapprovisionné selon la communauté
+        }
+      }
+    });
+    var best = rows.filter(function (r) { return r.price != null && r.rank < 1.5; }).sort(sorter('best'))[0] || null;
+    var list = rows.slice();
+    if (o.hideDry) list = list.filter(function (r) { return r.status !== 'dry' && r.rank !== 1.6; });
+    if (o.favOnly && o.favs) list = list.filter(function (r) { return o.favs.has(r.st.id); });
+    list.sort(sorter(o.sort));
+    return { rows: list, all: rows, avg: avg, counts: counts, best: best, minP: minP, maxP: maxP };
+  }
+
+  function buildCommIndex(msgs, now) {
+    now = now || Date.now();
+    var idx = {};
+    msgs.forEach(function (m) {
+      if (m.k !== 'report' || !m.sid || !m.s || now - m.at > COMM_MS) return;
+      (idx[m.sid] = idx[m.sid] || []).push(m);
+    });
+    Object.keys(idx).forEach(function (k) { idx[k].sort(function (a, b) { return b.at - a.at; }); });
+    return function (sid, fuel) {
+      var arr = idx[sid];
+      if (!arr) return null;
+      for (var i = 0; i < arr.length; i++) {
+        if (!arr[i].f || arr[i].f === fuel || arr[i].s === 'wait') return arr[i];
+      }
+      return null;
+    };
+  }
+
+  /* ---------- messages du chat : tout ce qui arrive est non fiable ---------- */
+  var MSG_STATUS = { ok: 1, dry: 1, wait: 1 };
+  function cleanText(s, n) {
+    if (typeof s !== 'string') return '';
+    return s.replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+  }
+  function sanitizeMsg(o, id, time, now) {
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+    if (o.app != null && o.app !== 'essencedispo') return null;
+    now = now || Date.now();
+    var k = o.k === 'report' ? 'report' : 'msg';
+    var s = MSG_STATUS[o.s] ? o.s : null;
+    var t = cleanText(o.t, 280).replace(/\b(?:https?:\/\/|www\.)\S+/gi, '[lien retiré]');
+    if (!t && !(k === 'report' && s)) return null;
+    var at = toNum(time != null ? time : o.at);
+    if (at == null) at = now;
+    if (at < 1e12) at *= 1000;
+    at = Math.min(at, now + MIN);
+    var la = toNum(o.la), lo = toNum(o.lo);
+    var mid = String(o.mid || id || '').replace(/[^A-Za-z0-9_\-.~:@+]/g, '').slice(0, 64) || ('m' + Math.round(at));
+    return {
+      mid: mid, t: t, p: cleanText(o.p, 24) || 'Anonyme', at: at, k: k, s: k === 'report' ? s : null,
+      sid: o.sid != null ? (cleanText(String(o.sid), 40) || null) : null,
+      sn: cleanText(o.sn, 90) || null,
+      f: FUEL[o.f] ? o.f : null,
+      la: la != null && Math.abs(la) <= 90 ? la : null,
+      lo: lo != null && Math.abs(lo) <= 180 ? lo : null,
+      uid: typeof o.uid === 'string' ? o.uid.slice(0, 80) : null
+    };
+  }
+
+  /* ---------- afficheur 7 segments du totem ---------- */
+  function segPolys(ox, oy, W, H, T, G) {
+    var L = ox + T / 2, R = ox + W - T / 2, Tp = oy + T / 2, M = oy + H / 2, B = oy + H - T / 2, h = T / 2;
+    var hz = function (x1, x2, y) { return [[x1, y], [x1 + h, y - h], [x2 - h, y - h], [x2, y], [x2 - h, y + h], [x1 + h, y + h]]; };
+    var vt = function (x, y1, y2) { return [[x, y1], [x + h, y1 + h], [x + h, y2 - h], [x, y2], [x - h, y2 - h], [x - h, y1 + h]]; };
+    var P = {
+      a: hz(L + G, R - G, Tp), g: hz(L + G, R - G, M), d: hz(L + G, R - G, B),
+      f: vt(L, Tp + G, M - G), b: vt(R, Tp + G, M - G), e: vt(L, M + G, B - G), c: vt(R, M + G, B - G)
+    };
+    var out = {};
+    Object.keys(P).forEach(function (k) {
+      out[k] = P[k].map(function (pt) { return pt[0].toFixed(1) + ',' + pt[1].toFixed(1); }).join(' ');
+    });
+    return out;
+  }
+  function priceDigits(price) {
+    if (price == null || !isFinite(price) || price >= 10) return ['-', '-', '-', '-'];
+    return price.toFixed(3).replace('.', '').split('');
+  }
+
+  /* ---------- formats français ---------- */
+  function fmtPrice3(p) { return p.toFixed(3).replace('.', ','); }
+  function fmtEuro(v) { return v.toFixed(2).replace('.', ',') + ' €'; }
+  function fmtKm(d) {
+    if (d < 1) return Math.max(50, Math.round(d * 1000 / 50) * 50) + ' m';
+    return (d < 10 ? d.toFixed(1) : String(Math.round(d))).replace('.', ',') + ' km';
+  }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtClock(t) { var d = new Date(t); return pad2(d.getHours()) + 'h' + pad2(d.getMinutes()); }
+  function fmtAgo(t, now) {
+    var s = Math.max(0, ((now || Date.now()) - t) / 1000);
+    if (s < 60) return 'à l’instant';
+    var m = Math.floor(s / 60);
+    if (m < 60) return 'il y a ' + m + ' min';
+    var h = Math.floor(m / 60);
+    if (h < 24) return 'il y a ' + h + ' h' + (h < 10 && m % 60 >= 5 ? ' ' + pad2(m % 60) : '');
+    return 'il y a ' + Math.floor(h / 24) + ' j';
+  }
+  var MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  function fmtSince(t, now) {
+    var d = new Date(t), n = new Date(now || Date.now());
+    if (d.toDateString() === n.toDateString()) return 'depuis ' + fmtClock(t);
+    var y = new Date(n.getTime()); y.setDate(n.getDate() - 1);
+    if (d.toDateString() === y.toDateString()) return 'depuis hier ' + fmtClock(t);
+    return 'depuis le ' + d.getDate() + ' ' + MOIS[d.getMonth()];
+  }
+  function stationTitle(st) { return st.name || st.adresse || 'Station'; }
+  function stationPlace(st) { return [st.demo ? '' : st.cp, st.ville].filter(Boolean).join(' '); }
+
+  /* ---------- stations d'exemple pour l'aperçu (jamais présentées comme réelles) ---------- */
+  function makeDemo(center, now) {
+    now = now || Date.now();
+    var seed = 20261108;
+    var rnd = function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    var streets = ['Avenue Jean Jaurès', 'Route de Paris', 'Boulevard Gambetta', 'Rue de la République', 'Avenue de l’Europe', 'Rue Victor Hugo',
+      'Route Nationale 7', 'Avenue du Général de Gaulle', 'Rue Pasteur', 'Zone commerciale des Portes', 'Rue des Lilas', 'Avenue Foch',
+      'Chemin du Moulin', 'Rue Émile Zola', 'Boulevard de la Liberté', 'Rue du Stade', 'Avenue des Tilleuls', 'Route de Lyon',
+      'Rue de la Gare', 'Avenue Aristide Briand', 'Quai des Mariniers', 'Rue Nationale'];
+    var towns = ['Démoville', 'Démoville-Nord', 'Saint-Démo', 'Les Essais', 'Port-Exemple'];
+    var base = { gazole: 2.07, e10: 1.92, sp98: 2.04, sp95: 1.98, e85: 0.88, gplc: 1.05 };
+    var services = ['Boutique', 'Lavage automatique', 'Gonflage', 'Toilettes', 'DAB', 'Bornes électriques', 'Restauration rapide'];
+    var cosLat = Math.cos(center.lat * Math.PI / 180);
+    var out = [];
+    for (var i = 0; i < 26; i++) {
+      var ang = rnd() * Math.PI * 2;
+      var d = 0.35 + Math.pow(rnd(), 0.85) * 13.5;
+      var capped = i % 4 === 1;
+      var fuels = {};
+      FUELS.forEach(function (F) {
+        var sells = (F.key === 'gazole' || F.key === 'e10') ? true :
+          F.key === 'sp98' ? rnd() > 0.15 : F.key === 'sp95' ? rnd() > 0.55 : F.key === 'e85' ? rnd() > 0.55 : rnd() > 0.72;
+        if (!sells) { fuels[F.key] = { price: null, maj: null, rType: 'definitive', rStart: null, listed: false, unlisted: true }; return; }
+        var price = Math.round((base[F.key] + (rnd() - 0.5) * 0.17) * 1000) / 1000;
+        if (capped && F.key === 'gazole') price = 2.25;
+        var dry = F.key === 'gazole' ? rnd() < (capped ? 0.5 : 0.1) : (F.key === 'e10' ? rnd() < 0.07 : false);
+        var maj = now - Math.round(rnd() * 8 * HOUR) - ((i === 6 || i === 17) ? 3 * DAY : 0);
+        fuels[F.key] = dry
+          ? { price: null, maj: maj, rType: 'temporaire', rStart: now - Math.round((0.5 + rnd() * 18) * HOUR), listed: true, unlisted: false }
+          : { price: price, maj: maj, rType: '', rStart: null, listed: true, unlisted: false };
+      });
+      out.push({
+        id: 'demo-' + (i + 1),
+        lat: center.lat + d * Math.cos(ang) / 110.574,
+        lon: center.lon + d * Math.sin(ang) / (111.32 * cosLat),
+        name: '',
+        adresse: i === 9 ? 'Aire de Démoville-Est (A7)' : (2 + Math.floor(rnd() * 180)) + ' ' + streets[i % streets.length],
+        ville: towns[Math.floor(rnd() * towns.length)],
+        cp: '', autoroute: i === 9, h24: rnd() > 0.35,
+        services: services.filter(function () { return rnd() > 0.5; }),
+        hoursJson: null,
+        hoursText: 'Automate-24-24, Lundi07.00-21.00, Mardi07.00-21.00, Mercredi07.00-21.00, Jeudi07.00-21.00, Vendredi07.00-21.30, Samedi08.00-21.30, Dimanche09.00-12.30',
+        demo: true,
+        fuels: fuels
+      });
+    }
+    return out;
+  }
+
+  root.CDCore = {
+    MIN: MIN, HOUR: HOUR, DAY: DAY, STALE_MS: STALE_MS, COMM_MS: COMM_MS,
+    FUELS: FUELS, FUEL: FUEL, RANK: RANK, SEGMAP: SEGMAP,
+    nrm: nrm, toNum: toNum, toTime: toTime, toList: toList, titleCase: titleCase,
+    normalize: normalize, statusOf: statusOf, km: km, todayHours: todayHours,
+    computeView: computeView, buildCommIndex: buildCommIndex, sanitizeMsg: sanitizeMsg,
+    segPolys: segPolys, priceDigits: priceDigits,
+    fmtPrice3: fmtPrice3, fmtEuro: fmtEuro, fmtKm: fmtKm, fmtAgo: fmtAgo, fmtClock: fmtClock, fmtSince: fmtSince,
+    stationTitle: stationTitle, stationPlace: stationPlace, makeDemo: makeDemo
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Essence Dispo — interface, données en direct, GPS, carte 3D, communauté */
+(() => {
+  'use strict';
+  const C = window.CDCore;
+  const { FUELS, FUEL, HOUR, MIN, DAY } = C;
+
+  /* ---------- configuration ---------- */
+  const API = 'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2';
+  const GEO = ['https://data.geopf.fr/geocodage', 'https://api-adresse.data.gouv.fr'];
+  const CHAT_TOPIC = 'essencedispo-fr-k7w2q9x4mz'; // canal public du chat de la version en ligne (ntfy.sh)
+  const NTFY = 'https://ntfy.sh/';
+  const REFRESH_MS = 10 * MIN;
+  const DEFAULT_PLACE = { lat: 48.8566, lon: 2.3522, label: 'Paris', source: 'default' };
+  const DEMO_PLACE = { lat: 45.7578, lon: 4.832, label: 'Démoville', source: 'demo' };
+  const RADII = [5, 10, 20, 30];
+  const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
+  const FORCE_DEMO = !IN_CLAUDE && /^#demo$/i.test(location.hash); // index.html#demo : démonstration hors ligne
+
+  const $ = (s, el) => (el || document).querySelector(s);
+  const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const round = (v, d) => Math.round(v * Math.pow(10, d)) / Math.pow(10, d);
+  const newId = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('ed.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('ed.' + k, JSON.stringify(v)); } catch (e) { /* stockage indisponible : on continue sans */ } },
+    del(k) { try { localStorage.removeItem('ed.' + k); } catch (e) { /* idem */ } }
+  };
+
+  /* ---------- icônes ---------- */
+  const ICONS = {
+    nav: '<path d="M3.5 11.2 20 4l-7.2 16.5-2.1-7.2z"/>',
+    star: '<path d="m12 3.5 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+    share: '<path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+    close: '<path d="M6 6l12 12M18 6 6 18"/>',
+    check: '<path d="M4.5 12.5 9.5 17.5 19.5 7"/>',
+    alert: '<path d="M12 3.5 21.5 20h-19z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    pin: '<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+    eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 8.5 4.3 9.5 6-.5.9-1.6 2.4-3.2 3.7M6.6 7.6C4.7 8.9 3.3 10.7 2.5 12c1 1.7 4.5 6 9.5 6 1.5 0 2.9-.4 4.1-1"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+    card: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',
+    road: '<path d="M8 3 5 21M16 3l3 18M12 4v3M12 11v3M12 18v2"/>',
+    shop: '<path d="M4 9h16l-1 11H5z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/>',
+    chev: '<path d="m9 6 6 6-6 6"/>'
+  };
+  const icon = (n, cls) => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n] || ''}</svg>`;
+  /* étiquettes européennes des carburants (cercle essence, carré gazole, losange gaz) */
+  function euSvg(F, cls) {
+    const shape = F.shape === 'circle' ? '<circle cx="20" cy="20" r="16.5"/>'
+      : F.shape === 'square' ? '<rect x="4" y="4" width="32" height="32" rx="2.5"/>'
+      : '<rect x="9" y="9" width="22" height="22" rx="1.5" transform="rotate(45 20 20)"/>';
+    const fs = F.eu.length >= 3 ? 12 : 15;
+    return `<svg class="${cls || 'eu'}" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3">${shape}</g><text x="20" y="${(20 + fs * 0.36).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="700" font-family="Arial, Helvetica, sans-serif" fill="currentColor">${F.eu}</text></svg>`;
+  }
+
+  /* ---------- état ---------- */
+  const S = {
+    mode: 'boot', place: null, fuel: 'gazole', radius: 10, sort: 'best', hideDry: false, favOnly: false,
+    tank: 40, cons: 6.5, pseudo: '', favs: new Set(), hiddenMsgs: new Set(), mine: new Set(),
+    stations: [], fetchedAt: 0, fetchedFor: null, fetchSeq: 0, loading: false, error: null,
+    view: null, comm: null, showCount: 30, tab: 'list',
+    msgs: new Map(), chatFilter: 'near', unread: 0, chatSince: Date.now(), lastSend: 0, attach: null,
+    chat: { backend: null, state: 'connecting', readOnly: false, uid: null },
+    sheet: null, sheetStation: null, editPseudo: false
+  };
+
+  function loadPrefs() {
+    const p = store.get('prefs', {}) || {};
+    if (FUEL[p.fuel]) S.fuel = p.fuel;
+    if (RADII.indexOf(p.radius) >= 0) S.radius = p.radius;
+    if (['best', 'price', 'dist'].indexOf(p.sort) >= 0) S.sort = p.sort;
+    S.hideDry = !!p.hideDry;
+    if (p.tank >= 5 && p.tank <= 150) S.tank = p.tank;
+    if (p.cons >= 2 && p.cons <= 30) S.cons = p.cons;
+    S.pseudo = typeof p.pseudo === 'string' ? p.pseudo.slice(0, 24) : '';
+    S.favs = new Set(store.get('favs', []) || []);
+    S.hiddenMsgs = new Set(store.get('hidden', []) || []);
+    S.mine = new Set(store.get('mine', []) || []);
+  }
+  function savePrefs() {
+    store.set('prefs', { fuel: S.fuel, radius: S.radius, sort: S.sort, hideDry: S.hideDry, tank: S.tank, cons: S.cons, pseudo: S.pseudo });
+  }
+
+  /* =====================================================================
+     DONNÉES : flux officiel, géocodage, GPS
+     ===================================================================== */
+  function fetchT(url, ms, opts) {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms);
+    return fetch(url, Object.assign({ signal: ctl.signal }, opts || {})).finally(() => clearTimeout(t));
+  }
+
+  async function fetchStations(place, radius) {
+    const pt = `geom'POINT(${place.lon.toFixed(5)} ${place.lat.toFixed(5)})'`;
+    const dLat = radius / 110.574, dLon = radius / (111.32 * Math.cos(place.lat * Math.PI / 180));
+    const wheres = [
+      `within_distance(geom, ${pt}, ${radius}km)`,
+      `distance(geom, ${pt}, ${radius}km)`,
+      `in_bbox(geom, ${(place.lat - dLat).toFixed(5)}, ${(place.lon - dLon).toFixed(5)}, ${(place.lat + dLat).toFixed(5)}, ${(place.lon + dLon).toFixed(5)})`
+    ];
+    if (place.cp && /^\d{2}/.test(place.cp)) wheres.push(`startswith(cp, "${place.cp.slice(0, 2)}")`);
+    let lastErr = null;
+    for (const where of wheres) {
+      const res = await fetchT(API + '/exports/json?' + new URLSearchParams({ where }).toString(), 25000);
+      if (res.ok) {
+        const data = await res.json();
+        const arr = Array.isArray(data) ? data : (data && Array.isArray(data.results) ? data.results : []);
+        const now = Date.now();
+        return arr.map(r => C.normalize(r, now)).filter(Boolean);
+      }
+      lastErr = new Error('HTTP ' + res.status);
+      if (res.status !== 400 && res.status !== 404) break; // 400 : syntaxe refusée → requête suivante
+    }
+    throw lastErr || new Error('Réponse vide');
+  }
+
+  async function geocode(q, limit) {
+    const params = new URLSearchParams({ q, limit: String(limit || 5), autocomplete: '1' });
+    for (const base of GEO) {
+      try {
+        const res = await fetchT(`${base}/search/?${params}`, 8000);
+        if (!res.ok) continue;
+        const j = await res.json();
+        return (j.features || []).filter(f => f && f.geometry && f.properties).map(f => ({
+          label: f.properties.label, city: f.properties.city, postcode: f.properties.postcode, type: f.properties.type,
+          context: f.properties.context, lon: +f.geometry.coordinates[0], lat: +f.geometry.coordinates[1]
+        })).filter(x => isFinite(x.lat) && isFinite(x.lon));
+      } catch (e) { /* service suivant */ }
+    }
+    return null;
+  }
+  async function reverse(lat, lon) {
+    const params = new URLSearchParams({ lat: lat.toFixed(5), lon: lon.toFixed(5), limit: '1' });
+    for (const base of GEO) {
+      try {
+        const res = await fetchT(`${base}/reverse/?${params}`, 8000);
+        if (!res.ok) continue;
+        const j = await res.json();
+        const p = j.features && j.features[0] && j.features[0].properties;
+        if (p) return { label: p.city || p.label, postcode: p.postcode || '' };
+      } catch (e) { /* service suivant */ }
+    }
+    return null;
+  }
+
+  function saveCache() {
+    if (S.mode !== 'live' || !S.fetchedFor) return;
+    store.set('cache', { at: S.fetchedAt, place: { lat: S.fetchedFor.lat, lon: S.fetchedFor.lon }, radius: S.fetchedFor.radius, stations: S.stations });
+  }
+
+  async function refresh(opts) {
+    opts = opts || {};
+    if (S.mode === 'demo') {
+      S.stations = C.makeDemo(DEMO_PLACE, Date.now()); S.fetchedAt = Date.now();
+      renderAll({ animate: true }); return;
+    }
+    if (!S.place) return;
+    const seq = ++S.fetchSeq;
+    S.loading = true;
+    renderLive();
+    if (!S.stations.length) renderAll();
+    try {
+      const radius = S.radius;
+      const list = await fetchStations(S.place, radius);
+      if (seq !== S.fetchSeq) return;
+      S.stations = list; S.fetchedAt = Date.now();
+      S.fetchedFor = { lat: S.place.lat, lon: S.place.lon, radius };
+      S.mode = 'live'; S.error = null;
+      saveCache();
+    } catch (err) {
+      if (seq !== S.fetchSeq) return;
+      if (IN_CLAUDE && S.mode !== 'live') { enterDemo(); return; }
+      S.error = err;
+      if (!S.stations.length) S.mode = 'error';
+      if (!opts.quiet) toast('Impossible de joindre le serveur des prix. Réessaie dans un instant.');
+    } finally {
+      if (seq === S.fetchSeq && S.mode !== 'demo') { S.loading = false; renderAll({ animate: !opts.quiet }); }
+    }
+  }
+
+  function enterDemo() {
+    S.mode = 'demo'; S.loading = false;
+    S.place = Object.assign({}, DEMO_PLACE);
+    S.stations = C.makeDemo(DEMO_PLACE, Date.now()); S.fetchedAt = Date.now();
+    renderAll({ animate: true });
+  }
+
+  function setPlace(p) {
+    S.place = p; store.set('place', p);
+    S.showCount = 30;
+    Radar.select(null);
+    renderPlace();
+    refresh();
+  }
+  function setRadius(r) {
+    if (RADII.indexOf(r) < 0) return;
+    S.radius = r; S.showCount = 30; savePrefs();
+    const f = S.fetchedFor;
+    const covered = S.mode === 'demo' || (f && S.place && C.km(f, S.place) < 0.05 && r <= f.radius);
+    if (covered) renderAll({ animate: true }); else refresh();
+  }
+  function setFuel(k) {
+    if (!FUEL[k] || k === S.fuel) return;
+    S.fuel = k; S.showCount = 30; savePrefs();
+    renderAll({ animate: true });
+  }
+
+  function locate(silent) {
+    if (S.mode === 'demo') { if (!silent) toast(IN_CLAUDE ? 'Le GPS est bloqué dans l’aperçu Claude. Il marchera dans la version en ligne.' : 'Le GPS est désactivé en mode démo.'); return; }
+    if (!navigator.geolocation) { if (!silent) toast('Ton navigateur ne donne pas accès au GPS. Tape une ville à la place.'); return; }
+    const btn = $('#gpsBtn');
+    btn.setAttribute('aria-busy', 'true');
+    navigator.geolocation.getCurrentPosition(pos => {
+      btn.removeAttribute('aria-busy');
+      const p = { lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'Ma position', source: 'gps' };
+      setPlace(p);
+      reverse(p.lat, p.lon).then(r => {
+        if (r && S.place && S.place.source === 'gps' && S.place.lat === p.lat) {
+          S.place.label = 'Près de ' + r.label; S.place.cp = r.postcode;
+          store.set('place', S.place); renderPlace();
+        }
+      });
+    }, err => {
+      btn.removeAttribute('aria-busy');
+      if (silent) return;
+      if (err && err.code === 1) toast('Localisation refusée. Autorise-la dans les réglages du navigateur, ou tape une ville.');
+      else toast('Position introuvable pour l’instant. Réessaie ou tape une ville.');
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+  }
+  function maybeAutoGps() {
+    try {
+      if (!navigator.permissions || !navigator.geolocation) return;
+      navigator.permissions.query({ name: 'geolocation' }).then(p => { if (p.state === 'granted') locate(true); }).catch(() => {});
+    } catch (e) { /* API absente */ }
+  }
+
+  /* =====================================================================
+     RENDU
+     ===================================================================== */
+  function recompute() {
+    if (!S.place) { S.view = null; return; }
+    S.view = C.computeView(S.stations, {
+      place: S.place, radius: S.radius, fuel: S.fuel, sort: S.sort, tank: S.tank, cons: S.cons,
+      hideDry: S.hideDry, favOnly: S.favOnly, favs: S.favs
+    }, Date.now(), S.comm);
+  }
+  function renderAll(o) {
+    o = o || {};
+    recompute();
+    renderLive(); renderPlace(); renderFuelBar(); renderTotem(); renderStats(); renderTools(); renderList(o.animate);
+    $('#demoBanner').hidden = !(S.mode === 'demo' && IN_CLAUDE);
+    if (S.tab === 'radar') Radar.update(S.view);
+    if (S.tab === 'chat') renderChat();
+  }
+
+  function renderLive() {
+    const el = $('#liveBtn'), tx = $('#liveText');
+    let state = S.mode, text = 'Chargement…', html = null;
+    if (S.loading) { state = 'loading'; text = 'Mise à jour…'; }
+    else if (S.mode === 'demo') text = IN_CLAUDE ? 'Aperçu' : 'Démo';
+    else if (S.mode === 'error') text = 'Hors ligne';
+    else if (S.mode === 'live') {
+      const old = Date.now() - S.fetchedAt > 15 * MIN, clock = C.fmtClock(S.fetchedAt);
+      state = old ? 'error' : 'live';
+      text = old ? 'Données de ' + clock : 'En direct · ' + clock;
+      if (!old) html = `<span class="lx">En direct · </span>${clock}`;
+    }
+    el.dataset.state = state;
+    if (html) tx.innerHTML = html; else tx.textContent = text;
+    el.setAttribute('aria-label', S.mode === 'demo' ? 'Aperçu avec des stations d’exemple. En savoir plus' : text + '. Actualiser');
+  }
+
+  function renderPlace() {
+    const p = S.place, el = $('#placeName');
+    if (!p) el.innerHTML = '<strong>Localisation…</strong>';
+    else {
+      const tag = S.mode === 'demo' ? '<em>exemple</em>' : p.source === 'default' ? '<em>par défaut</em>' : p.source === 'gps' ? '<em>GPS</em>' : '';
+      el.innerHTML = `<strong>${esc(p.label)}</strong> ${tag}`;
+    }
+    $('#radiusSel').value = String(S.radius);
+  }
+
+  function renderFuelBar() {
+    const bar = $('#fuelBar');
+    if (!bar.children.length) {
+      bar.innerHTML = FUELS.map(F => `<button type="button" class="fuel" role="radio" aria-checked="false" data-fuel="${F.key}">${euSvg(F)}<span>${F.name}</span></button>`).join('');
+    }
+    $$('.fuel', bar).forEach(b => {
+      const on = b.dataset.fuel === S.fuel;
+      b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1;
+    });
+  }
+
+  /* ---------- totem LED 7 segments ---------- */
+  const LED = { cells: [], dp: null, last: '', timer: 0 };
+  function buildLed() {
+    const mk = (ox, w, h, t, g, idx) => {
+      const P = C.segPolys(ox, 1, w, h, t, g);
+      return 'abcdefg'.split('').map(s => `<polygon data-c="${idx}" data-s="${s}" points="${P[s]}"/>`).join('');
+    };
+    let html = '<svg class="seg" viewBox="0 0 218 82" aria-hidden="true"><g transform="skewX(-7) translate(10 0)">';
+    html += mk(14, 44, 80, 9, 1.6, 0) + '<rect data-dp="1" x="61" y="71" width="9" height="9" rx="1.5"/>';
+    html += mk(74, 44, 80, 9, 1.6, 1) + mk(127, 44, 80, 9, 1.6, 2) + mk(180, 26, 47, 6, 1.2, 3);
+    html += '</g></svg>';
+    $('#segWrap').innerHTML = html;
+    LED.cells = [0, 1, 2, 3].map(i => {
+      const o = {};
+      $$(`#segWrap polygon[data-c="${i}"]`).forEach(p => { o[p.getAttribute('data-s')] = p; });
+      return o;
+    });
+    LED.dp = $('#segWrap [data-dp]');
+    paintLed(['-', '-', '-', '-']);
+  }
+  function paintLed(chars) {
+    LED.cells.forEach((cell, i) => {
+      const on = C.SEGMAP[chars[i]] || '';
+      Object.keys(cell).forEach(s => cell[s].classList.toggle('on', on.indexOf(s) >= 0));
+    });
+    if (LED.dp) LED.dp.classList.toggle('on', chars.join('') !== '----');
+  }
+  function setLed(price) {
+    const target = C.priceDigits(price), key = target.join('');
+    if (key === LED.last) return;
+    clearInterval(LED.timer);
+    LED.last = key;
+    if (reduced() || key === '----') { paintLed(target); return; }
+    let n = 0;
+    LED.timer = setInterval(() => {
+      n++;
+      paintLed(target.map((d, i) => (n >= 3 + i * 2 ? d : String(Math.floor(Math.random() * 10)))));
+      if (n >= 10) { clearInterval(LED.timer); paintLed(target); }
+    }, 55);
+  }
+
+  function renderTotem() {
+    const F = FUEL[S.fuel], v = S.view;
+    $('#totemEu').innerHTML = euSvg(F);
+    $('#totemFuel').textContent = F.name;
+    const foot = $('#totemFoot'), tag = $('#totemTag'), btn = $('#totem');
+    if (!v || (S.loading && !S.stations.length)) {
+      setLed(null); tag.textContent = 'Meilleur prix dispo';
+      foot.innerHTML = '<span>Recherche des stations…</span>'; btn.setAttribute('aria-label', 'Recherche des stations en cours');
+      return;
+    }
+    const best = v.best;
+    if (best) {
+      setLed(best.price);
+      tag.textContent = best.status === 'stale' ? 'Prix bas à vérifier' : 'Meilleur prix dispo';
+      foot.innerHTML = `${icon('nav')}<span>À <b>${C.fmtKm(best.dist)}</b> · ${esc(C.stationTitle(best.st))}${best.st.ville ? ', ' + esc(best.st.ville) : ''}</span>`;
+      btn.setAttribute('aria-label', `Meilleur choix : ${C.fmtPrice3(best.price)} euros le litre, à ${C.fmtKm(best.dist)}, ${C.stationTitle(best.st)}. Ouvrir la fiche.`);
+    } else {
+      setLed(null); tag.textContent = 'Aucun prix dispo';
+      const msg = S.mode === 'error' ? 'Pas de données pour l’instant.' : v.counts.total ? 'Toutes les stations du coin sont à sec pour ce carburant.' : 'Aucune station ne vend ce carburant dans ce rayon.';
+      foot.innerHTML = `${icon('alert')}<span>${msg}</span>`;
+      btn.setAttribute('aria-label', msg);
+    }
+  }
+
+  function renderStats() {
+    const v = S.view, c = v && v.counts;
+    const ids = ['#stTotal', '#stOk', '#stDry', '#stAvg'];
+    if (!c || (S.loading && !S.stations.length) || (S.mode === 'error' && !S.stations.length)) {
+      ids.forEach(id => { $(id).textContent = '–'; });
+      ['#mOk', '#mStale', '#mDry'].forEach(id => { $(id).style.width = '0'; });
+      $('#meterNote').textContent = '';
+      return;
+    }
+    $('#stTotal').textContent = c.total;
+    $('#stOk').textContent = c.ok + c.stale + c.noprice;
+    $('#stDry').textContent = c.dry;
+    $('#stAvg').textContent = v.avg != null ? v.avg.toFixed(2).replace('.', ',') : '–';
+    const tot = c.total || 1;
+    $('#mOk').style.width = (100 * (c.ok + c.noprice) / tot) + '%';
+    $('#mStale').style.width = (100 * c.stale / tot) + '%';
+    $('#mDry').style.width = (100 * c.dry / tot) + '%';
+    const pct = c.total ? Math.round(100 * c.dry / c.total) : 0;
+    $('#meterNote').textContent = c.total
+      ? `${pct} % des stations du coin sont à sec en ${FUEL[S.fuel].name}${c.stale ? ` · ${c.stale} affiche${c.stale > 1 ? 'nt' : ''} un prix de plus de 48 h` : ''}.`
+      : '';
+  }
+
+  function renderTools() {
+    $$('#sortCtl [data-sort]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.sort === S.sort)));
+    $('#favToggle').setAttribute('aria-pressed', String(S.favOnly));
+    const hint = {
+      best: `Classement par coût réel : plein de ${S.tank} L + trajet aller-retour.`,
+      price: 'Du moins cher au plus cher. Les stations à sec passent en dernier.',
+      dist: 'De la plus proche à la plus éloignée.'
+    }[S.sort];
+    $('#sortHint').innerHTML = `${esc(hint)} <button type="button" class="link" data-open="settings">Réglages</button>`;
+  }
+
+  const COMM_LABEL = { dry: ['bad', 'Signalé à sec'], ok: ['ok', 'Confirmé dispo'], wait: ['warn', 'Attente signalée'] };
+  function commPill(m, now) {
+    const l = COMM_LABEL[m.s];
+    return l ? `<span class="pill comm ${l[0]}" title="Signalement de la communauté">${l[1]} · ${C.fmtAgo(m.at, now).replace('il y a ', '')}</span>` : '';
+  }
+  function statusPill(r, now) {
+    if (r.status === 'ok') return `<span class="pill ok">Dispo${r.f.maj ? ' · mis à jour ' + C.fmtAgo(r.f.maj, now) : ''}</span>`;
+    if (r.status === 'stale') return `<span class="pill warn">Prix ancien · ${C.fmtAgo(r.f.maj, now)}</span>`;
+    if (r.status === 'dry') return `<span class="pill bad">À sec${r.f.rStart ? ' ' + C.fmtSince(r.f.rStart, now) : ''}</span>`;
+    return '<span class="pill neutral">Prix non communiqué</span>';
+  }
+  function priceHTML(price) {
+    const s = C.fmtPrice3(price);
+    return `${s.slice(0, -1)}<small>${s.slice(-1)}</small>`;
+  }
+  function cardHTML(r, i, now, isBest) {
+    const st = r.st, F = FUEL[S.fuel];
+    const sub = [C.stationPlace(st), C.fmtKm(r.dist), st.h24 ? '24/24' : '', st.autoroute ? 'Autoroute' : ''].filter(Boolean).join(' · ');
+    let price;
+    if (r.price != null) price = `<span class="p num">${priceHTML(r.price)}</span><span class="u">€/L</span>`;
+    else if (r.status === 'dry') price = `<span class="p dry">À sec</span><span class="u">${esc(F.short)}</span>`;
+    else price = '<span class="p na">—</span><span class="u">prix ?</span>';
+    const pills = [statusPill(r, now)];
+    if (r.comm) pills.push(commPill(r.comm, now));
+    if (r.status === 'ok' && r.save != null && r.save >= 0.5) pills.push(`<span class="pill save">−${C.fmtEuro(r.save)} sur ${S.tank} L</span>`);
+    const fav = S.favs.has(st.id) ? icon('star') : '';
+    return `<li><button type="button" class="st${r.status === 'dry' ? ' is-dry' : ''}${isBest ? ' is-best' : ''}" data-id="${esc(st.id)}" style="--i:${i}">` +
+      (isBest ? '<span class="flag">Meilleur choix</span>' : '') +
+      `<span class="st-price">${price}</span>` +
+      `<span class="st-main"><span class="st-name">${esc(C.stationTitle(st))}${fav}</span><span class="st-sub">${esc(sub)}</span><span class="tags">${pills.join('')}</span></span>` +
+      '</button></li>';
+  }
+  const emptyHTML = (t, p, a) => `<li class="empty"><h3>${esc(t)}</h3><p>${esc(p)}</p>${a || ''}</li>`;
+
+  function renderList(animate) {
+    const ol = $('#list'), more = $('#moreBtn'), v = S.view;
+    ol.classList.toggle('still', !animate);
+    if (!v || (S.loading && !S.stations.length)) { ol.innerHTML = '<li class="sk"></li>'.repeat(4); more.hidden = true; return; }
+    if (S.mode === 'error' && !S.stations.length) {
+      ol.innerHTML = emptyHTML('Impossible de charger les prix', 'Le serveur des prix ne répond pas, ou tu n’as pas de connexion.', '<button type="button" class="btn primary" data-act="retry">Réessayer</button>');
+      more.hidden = true; return;
+    }
+    if (!v.rows.length) {
+      const F = FUEL[S.fuel];
+      let html;
+      if (S.favOnly) html = emptyHTML('Aucun favori dans ce rayon', 'Ouvre la fiche d’une station et touche « Favori » pour la retrouver ici.', '<button type="button" class="btn" data-act="favoff">Voir toutes les stations</button>');
+      else if (v.counts.total && S.hideDry) html = emptyHTML(`Tout est à sec en ${F.name}`, 'Les stations du coin qui vendent ce carburant ont toutes déclaré une rupture.', '<button type="button" class="btn" data-act="showdry">Les afficher quand même</button>');
+      else {
+        const next = RADII.filter(x => x > S.radius)[0];
+        html = emptyHTML(`Pas de ${F.name} dans ${S.radius} km`, 'Aucune station de cette zone ne vend ce carburant.', next ? `<button type="button" class="btn primary" data-act="widen" data-r="${next}">Chercher jusqu’à ${next} km</button>` : '');
+      }
+      ol.innerHTML = html; more.hidden = true; return;
+    }
+    const now = Date.now();
+    ol.innerHTML = v.rows.slice(0, S.showCount).map((r, i) => cardHTML(r, i, now, S.sort === 'best' && i === 0 && r === v.best)).join('');
+    more.hidden = v.rows.length <= S.showCount;
+    if (!more.hidden) more.textContent = `Afficher ${Math.min(30, v.rows.length - S.showCount)} stations de plus`;
+  }
+
+  /* ---------- onglets ---------- */
+  const TABS = ['list', 'radar', 'chat'];
+  function setTab(name, focusTab) {
+    S.tab = name;
+    TABS.forEach(n => {
+      const t = $('#tab-' + n), p = $('#panel-' + n), on = n === name;
+      t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; p.hidden = !on;
+    });
+    $('#tabInd').style.transform = `translateX(${TABS.indexOf(name) * 100}%)`;
+    if (focusTab) $('#tab-' + name).focus();
+    if (name === 'radar') Radar.show(); else Radar.hide();
+    if (name === 'chat') {
+      S.unread = 0; renderBadge(); renderChat(true);
+    }
+  }
+
+  /* =====================================================================
+     FICHES (station, réglages, aide)
+     ===================================================================== */
+  let sheetReturn = null, sheetCloseTimer = 0;
+  function openSheet(kind, html) {
+    clearTimeout(sheetCloseTimer);
+    const sheet = $('#sheet'), bd = $('#backdrop');
+    sheet.classList.remove('closing'); bd.classList.remove('closing');
+    if (sheet.hidden) sheetReturn = document.activeElement;
+    S.sheet = kind;
+    $('#sheetBody').innerHTML = html;
+    sheet.hidden = false; bd.hidden = false;
+    document.body.classList.add('locked');
+    const first = $('#sheet [data-autofocus]') || $('#sheet [data-close]');
+    if (first) first.focus({ preventScroll: true });
+  }
+  function closeSheet() {
+    const sheet = $('#sheet'), bd = $('#backdrop');
+    if (sheet.hidden) return;
+    S.sheet = null; S.sheetStation = null;
+    document.body.classList.remove('locked');
+    const done = () => { sheet.hidden = true; bd.hidden = true; sheet.classList.remove('closing'); bd.classList.remove('closing'); };
+    if (reduced()) done();
+    else { sheet.classList.add('closing'); bd.classList.add('closing'); sheetCloseTimer = setTimeout(done, 230); }
+    if (sheetReturn && sheetReturn.focus && document.contains(sheetReturn)) sheetReturn.focus({ preventScroll: true });
+  }
+  const sheetHead = (title, sub) => `<header class="sh-head"><div class="sh-title"><h2 id="sheetTitle">${esc(title)}</h2>${sub ? `<p>${sub}</p>` : ''}</div><button type="button" class="icon-btn" data-close aria-label="Fermer">${icon('close')}</button></header>`;
+
+  function findStation(id) { return S.stations.find(s => s.id === id) || null; }
+  function openStation(id) {
+    const st = findStation(id);
+    if (!st) { toast('Cette station n’est pas dans ta zone actuelle.'); return; }
+    S.sheetStation = st;
+    openSheet('station', stationSheet(st));
+  }
+
+  function reportsHTML(st) {
+    const now = Date.now();
+    const list = Array.from(S.msgs.values()).filter(m => m.k === 'report' && m.sid === st.id && now - m.at < C.COMM_MS).sort((a, b) => b.at - a.at).slice(0, 4);
+    if (!list.length) return '<p class="fine">Aucun signalement depuis 3 h pour cette station.</p>';
+    return '<ul class="reports">' + list.map(m => {
+      const l = REPORT_LABEL[m.s] || ['neutral', 'Signalement'];
+      return `<li><span class="pill ${l[0]}">${l[1]}${m.f ? ' · ' + esc(FUEL[m.f].name) : ''}</span> par ${esc(m.p)}, ${C.fmtAgo(m.at, now)}</li>`;
+    }).join('') + '</ul>';
+  }
+
+  function stationSheet(st) {
+    const now = Date.now(), F = FUEL[S.fuel], f = st.fuels[S.fuel], status = C.statusOf(f, now);
+    const dist = S.place ? C.km(S.place, st) : null;
+    const where = [st.name && st.adresse ? st.adresse : '', C.stationPlace(st)].filter(Boolean).join(', ');
+    const sub = esc(where) + (dist != null ? ' · ' + C.fmtKm(dist) : '');
+    let main;
+    if (status === 'ok' || status === 'stale') {
+      main = `<div class="sh-price"><span class="big">${priceHTML(f.price)}</span><span>€/L · ${esc(F.name)}</span></div>` +
+        `<div class="sh-status">${statusPill({ status, f }, now)}</div>`;
+    } else if (status === 'dry') {
+      main = `<div class="sh-price dry"><span class="big">À sec</span><span>${esc(F.name)} · rupture ${f.rStart ? C.fmtSince(f.rStart, now) : 'déclarée par la station'}</span></div>`;
+    } else if (status === 'noprice') {
+      main = `<div class="sh-price na"><span class="big">—</span><span>${esc(F.name)} vendu ici, prix non communiqué</span></div>`;
+    } else {
+      main = `<div class="sh-price na"><span class="big">—</span><span>Cette station ne vend pas de ${esc(F.name)}</span></div>`;
+    }
+    const comm = S.comm ? S.comm(st.id, S.fuel) : null;
+    if (comm) main += `<div class="sh-status">${commPill(comm, now)}</div>`;
+    const fav = S.favs.has(st.id);
+    const demo = S.mode === 'demo';
+    const navs = demo ? '<p class="fine">Les itinéraires sont désactivés dans l’aperçu : ces stations sont des exemples.</p>'
+      : `<a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=${st.lat},${st.lon}" target="_blank" rel="noopener">Google Maps</a>` +
+        `<a class="btn" href="https://waze.com/ul?ll=${st.lat},${st.lon}&amp;navigate=yes" target="_blank" rel="noopener">Waze</a>` +
+        `<a class="btn" href="https://maps.apple.com/?daddr=${st.lat},${st.lon}" target="_blank" rel="noopener">Plans</a>`;
+    const rows = FUELS.map(G => {
+      const g = st.fuels[G.key], s = C.statusOf(g, now);
+      if (s === 'none') return '';
+      const val = s === 'dry' ? 'À sec' : s === 'noprice' ? '—' : `${C.fmtPrice3(g.price)} €`;
+      const when = s === 'dry' ? (g.rStart ? 'Rupture ' + C.fmtSince(g.rStart, now) : 'Rupture déclarée')
+        : s === 'noprice' ? 'Prix non communiqué'
+        : g.maj ? 'Mis à jour ' + C.fmtAgo(g.maj, now) + (s === 'stale' ? ' (ancien)' : '') : '';
+      return `<li class="fr ${s}${G.key === S.fuel ? ' cur' : ''}">${euSvg(G, 'eu')}<span class="fn">${G.name}</span><span class="fv">${val}</span><span class="fw">${when}</span></li>`;
+    }).join('');
+    const hours = C.todayHours(st, new Date());
+    return sheetHead(C.stationTitle(st), sub) + main +
+      `<div class="sh-actions">
+        <button type="button" class="btn primary" data-act="nav" aria-expanded="false" aria-controls="navs">${icon('nav')}Y aller</button>
+        <button type="button" class="btn" data-act="fav" aria-pressed="${fav}">${icon('star')}${fav ? 'Favori' : 'Favori'}</button>
+        <button type="button" class="btn" data-act="share">${icon('share')}Partager</button>
+      </div>
+      <div class="navs" id="navs" hidden>${navs}</div>
+      <section class="sh-sec" aria-labelledby="repTitle">
+        <h3 id="repTitle">Tu y es ? Dis-le aux autres · ${esc(F.name)}</h3>
+        <div class="report">
+          <button type="button" class="rep ok" data-rep="ok">${icon('check')}Il y en a</button>
+          <button type="button" class="rep bad" data-rep="dry">${icon('alert')}À sec</button>
+          <button type="button" class="rep warn" data-rep="wait">${icon('clock')}Grosse attente</button>
+        </div>
+        <div id="shReports">${reportsHTML(st)}</div>
+        <p class="fine"><button type="button" class="link" data-act="talk">Écrire un message sur cette station</button></p>
+      </section>
+      <section class="sh-sec"><h3>Tous les carburants</h3><ul class="fuel-rows">${rows || '<li class="fine">Aucun carburant déclaré.</li>'}</ul></section>
+      <section class="sh-sec"><h3>Infos pratiques</h3><ul class="infos">
+        <li>${icon('clock')}${hours ? (hours === 'fermé' ? 'Fermé aujourd’hui' : 'Aujourd’hui : ' + esc(hours)) : 'Horaires non communiqués'}</li>
+        ${st.h24 ? `<li>${icon('card')}Automate 24/24, paiement par carte</li>` : ''}
+        ${st.autoroute ? `<li>${icon('road')}Station d’autoroute</li>` : ''}
+      </ul>${st.services.length ? `<div class="svc">${st.services.map(s => `<span>${esc(s)}</span>`).join('')}</div>` : ''}</section>
+      <p class="fine">${demo ? 'Station d’exemple, affichée seulement dans l’aperçu.' : 'Prix et ruptures déclarés par la station au Ministère de l’Économie. Les signalements de la communauté ne sont pas vérifiés.'}</p>`;
+  }
+
+  function settingsSheet() {
+    return sheetHead('Réglages', 'Enregistrés sur cet appareil') +
+      `<section class="sh-sec"><h3>Rayon de recherche</h3>
+        <div class="seg-ctl" role="radiogroup" aria-label="Rayon">${RADII.map(r => `<button type="button" role="radio" aria-checked="${r === S.radius}" data-radius="${r}">${r} km</button>`).join('')}</div>
+      </section>
+      <section class="sh-sec"><h3>Ton plein</h3>
+        <div class="fields">
+          <label class="field" for="setTank"><span>Litres à mettre</span><input id="setTank" type="number" inputmode="numeric" min="5" max="150" step="1" value="${S.tank}"></label>
+          <label class="field" for="setCons"><span>Consommation (L/100 km)</span><input id="setCons" type="number" inputmode="decimal" min="2" max="30" step="0.1" value="${S.cons}"></label>
+        </div>
+        <p class="fine">Sert à calculer le coût réel du plein, trajet aller-retour compris, et ce que tu économises par rapport au prix moyen du coin.</p>
+      </section>
+      <section class="sh-sec"><h3>Communauté</h3>
+        <label class="field" for="setPseudo"><span>Ton pseudo</span><input id="setPseudo" maxlength="24" value="${esc(S.pseudo)}" placeholder="ex. Sam_69"></label>
+      </section>
+      <section class="sh-sec"><h3>Affichage</h3>
+        <label class="switch" for="setHideDry"><input type="checkbox" id="setHideDry"${S.hideDry ? ' checked' : ''}><span>Masquer les stations à sec</span></label>
+      </section>
+      <section class="sh-sec"><h3>Données</h3>
+        <p class="fine">Prix et ruptures : flux officiel « Prix des carburants » du Ministère de l’Économie, mis à jour toutes les 10 minutes, sous Licence Ouverte 2.0. Les ruptures sont déclarées par les stations elles-mêmes, parfois avec du retard.</p>
+        <p><button type="button" class="btn" data-act="reset">Effacer mes données sur cet appareil</button></p>
+      </section>`;
+  }
+
+  function helpSheet() {
+    return sheetHead('Mettre Essence Dispo en ligne', 'Pour avoir les vrais prix, les ruptures et le GPS') +
+      `<ol class="steps">
+        <li>Récupère le fichier <b>index.html</b> envoyé dans la conversation avec Claude.</li>
+        <li>Mets-le sur un hébergement gratuit, par exemple GitHub Pages ou Netlify. Tu obtiens un lien en https.</li>
+        <li>Ouvre ce lien sur ton téléphone : les prix officiels, les ruptures et ton GPS fonctionnent, et le chat est ouvert à tous.</li>
+        <li>Dans le menu du navigateur, choisis « Ajouter à l’écran d’accueil » : Essence Dispo s’ouvre comme une appli.</li>
+      </ol>
+      <p class="fine">Dans cet aperçu, Claude bloque les connexions vers d’autres sites et le GPS. C’est pour ça que tu vois des stations d’exemple à « Démoville ».</p>`;
+  }
+
+  function onSettingsInput(e) {
+    const t = e.target;
+    if (t.id === 'setTank') { const v = parseFloat(t.value); if (v >= 5 && v <= 150) { S.tank = Math.round(v); savePrefs(); renderAll(); } }
+    else if (t.id === 'setCons') { const v = parseFloat(String(t.value).replace(',', '.')); if (v >= 2 && v <= 30) { S.cons = round(v, 1); savePrefs(); renderAll(); } }
+    else if (t.id === 'setPseudo') { S.pseudo = t.value.replace(/\s+/g, ' ').trim().slice(0, 24); savePrefs(); renderComposer(true); }
+    else if (t.id === 'setHideDry') { S.hideDry = t.checked; savePrefs(); renderAll({ animate: true }); }
+  }
+
+  function toggleFav(st) {
+    if (S.favs.has(st.id)) S.favs.delete(st.id); else S.favs.add(st.id);
+    store.set('favs', Array.from(S.favs).slice(-200));
+    const b = $('#sheet [data-act="fav"]');
+    if (b) b.setAttribute('aria-pressed', String(S.favs.has(st.id)));
+    toast(S.favs.has(st.id) ? 'Ajoutée à tes favoris.' : 'Retirée de tes favoris.');
+    renderAll();
+  }
+
+  async function copyText(t) {
+    try { await navigator.clipboard.writeText(t); toast('Copié : tu peux le coller dans un message.'); }
+    catch (e) { toast(t); }
+  }
+  function shareStation(st) {
+    const F = FUEL[S.fuel], f = st.fuels[S.fuel], s = C.statusOf(f, Date.now());
+    const what = (s === 'ok' || s === 'stale') ? `${F.name} à ${C.fmtPrice3(f.price)} €/L` : s === 'dry' ? `${F.name} : à sec` : F.name;
+    const text = `${what} · ${C.stationTitle(st)}${st.ville ? ', ' + st.ville : ''} (vu sur Essence Dispo)`;
+    const url = S.mode === 'demo' ? '' : `https://www.google.com/maps/search/?api=1&query=${st.lat},${st.lon}`;
+    if (navigator.share && !IN_CLAUDE) {
+      navigator.share({ title: 'Essence Dispo', text, url: url || undefined }).catch(err => { if (!err || err.name !== 'AbortError') copyText(text + (url ? ' ' + url : '')); });
+      return;
+    }
+    copyText(text + (url ? ' ' + url : ''));
+  }
+
+  /* =====================================================================
+     CARTE 3D — rendu maison sur canvas 2D (aucune bibliothèque externe)
+     ===================================================================== */
+  const Radar = (() => {
+    const R = 10, HALF = Math.tan(20 * Math.PI / 180), FONT = '"Barlow Condensed", "Arial Narrow", "Inter", system-ui, sans-serif';
+    let cv = null, ctx = null, W = 0, H = 0, ready = false, active = false, visible = true, raf = 0, introDone = false;
+    let az = 0.62, phi = 0.92, tPhi = 0.92, zf = 1, zoom = 1, lastT = 0, growStart = 0, lastInteract = 0, introStart = 0;
+    let items = [], selectedId = null, lastKey = '', pal = null, cam = null;
+    const pointers = new Map();
+    let moved = 0, pinch0 = 0, z0 = 1;
+
+    const hexRgb = str => { const m = /^#?([0-9a-f]{6})$/i.exec((str || '').trim()); const n = m ? parseInt(m[1], 16) : 0x8492A5; return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+    const shade = (c, k) => 'rgb(' + c.map(v => Math.round(k >= 1 ? v + (255 - v) * (k - 1) : v * k)).join(',') + ')';
+    const easeOut = x => 1 - Math.pow(1 - x, 3);
+    const easeOutBack = x => 1 + 2.4 * Math.pow(x - 1, 3) + 1.4 * Math.pow(x - 1, 2);
+    const LIGHT = [0.62, 0, 0.78];
+
+    function readPalette() {
+      const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+      pal = { ok: hexRgb(g('--ok')), stale: hexRgb(g('--warn')), dry: hexRgb(g('--bad')), noprice: hexRgb(g('--ink-3')), sign: hexRgb(g('--sign')),
+        signal: g('--signal') || '#F5C400', surface: g('--surface') || '#FFFFFF', ink: g('--ink') || '#0C1932', ink2: g('--ink-2') || '#46577A', ink3: g('--ink-3') || '#7484A5' };
+    }
+    function init() {
+      cv = $('#radarCanvas');
+      ctx = cv.getContext && cv.getContext('2d');
+      if (!ctx) { const m = $('#radarMsg'); m.hidden = false; m.textContent = 'La carte 3D n’est pas disponible sur cet appareil. La liste des stations reste complète.'; return false; }
+      readPalette(); bindInput();
+      if (window.ResizeObserver) new ResizeObserver(resize).observe($('#radar')); else window.addEventListener('resize', resize);
+      if (window.IntersectionObserver) new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(cv);
+      ready = true;
+      return true;
+    }
+    function resize() {
+      if (!cv) return;
+      const box = $('#radar');
+      W = box.clientWidth; H = box.clientHeight;
+      if (!W || !H) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      kick();
+    }
+    const fitDist = () => Math.max(R * 1.25 / (HALF * (W / H)), R * 1.45 / HALF);
+
+    function setData(view) {
+      if (!S.place) { items = []; return; }
+      const rows = view ? view.all : [];
+      const cosLat = Math.cos(S.place.lat * Math.PI / 180), k = R / S.radius;
+      const minP = view ? view.minP : null, maxP = view ? view.maxP : null;
+      const top = rows.filter(r => r.price != null && r.rank < 1.5).sort((a, b) => a.cost - b.cost).slice(0, 3).map(r => r.st.id);
+      const key = [S.fuel, S.radius, S.place.lat.toFixed(4), S.place.lon.toFixed(4)].join('|');
+      const prev = key === lastKey ? new Map(items.map(it => [it.id, it])) : new Map();
+      lastKey = key;
+      const still = reduced();
+      items = rows.map((r, i) => {
+        const old = prev.get(r.st.id);
+        return {
+          id: r.st.id, row: r, status: r.status, price: r.price, top: top.indexOf(r.st.id),
+          x: (r.st.lon - S.place.lon) * 111.32 * cosLat * k,
+          z: -(r.st.lat - S.place.lat) * 110.574 * k,
+          h: r.price != null ? 0.7 + (maxP > minP ? (maxP - r.price) / (maxP - minP) : 0.5) * 3.3 : (r.status === 'dry' ? 0.28 : 0.45),
+          cur: old ? old.cur : (still ? 1 : 0), done: old ? old.done : still, delay: Math.min(i, 40) * 22
+        };
+      });
+      if (!prev.size) growStart = performance.now();
+      if (selectedId && !items.some(it => it.id === selectedId)) select(null); else if (selectedId) select(selectedId);
+      kick();
+    }
+
+    function makeCam() {
+      const d = fitDist() * zf;
+      const Cp = [d * Math.cos(phi) * Math.sin(az), d * Math.sin(phi), d * Math.cos(phi) * Math.cos(az)];
+      let f = [-Cp[0], 0.9 - Cp[1], -Cp[2]];
+      const fl = Math.hypot(f[0], f[1], f[2]); f = f.map(v => v / fl);
+      const rl = Math.hypot(f[2], f[0]) || 1, r = [-f[2] / rl, 0, f[0] / rl];
+      const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+      return { C: Cp, f, r, u, foc: (H / 2) / HALF, cx: W / 2, cy: H * 0.52 };
+    }
+    function P(x, y, z) {
+      const c = cam, vx = x - c.C[0], vy = y - c.C[1], vz = z - c.C[2];
+      const zc = vx * c.f[0] + vy * c.f[1] + vz * c.f[2];
+      if (zc < 0.3) return null;
+      return [c.cx + (vx * c.r[0] + vy * c.r[1] + vz * c.r[2]) / zc * c.foc, c.cy - (vx * c.u[0] + vy * c.u[1] + vz * c.u[2]) / zc * c.foc];
+    }
+    function path(pts) { ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); }
+    function ring(cx, cz, rad, n) { const out = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, p = P(cx + Math.cos(a) * rad, 0, cz + Math.sin(a) * rad); if (p) out.push(p); } return out; }
+    function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+    function drawGround() {
+      path(ring(0, 0, R * 1.1, 96));
+      ctx.fillStyle = pal.surface; ctx.fill();
+      ctx.globalAlpha = 0.6; ctx.lineWidth = 1.2; ctx.strokeStyle = pal.ink3; ctx.stroke();
+      [0.25, 0.5, 0.75, 1].forEach(f => {
+        path(ring(0, 0, R * f, 80));
+        ctx.globalAlpha = f === 1 ? 0.55 : 0.28; ctx.lineWidth = f === 1 ? 1.5 : 1; ctx.stroke();
+      });
+      ctx.globalAlpha = 0.18; ctx.lineWidth = 1;
+      [[-R, 0, R, 0], [0, -R, 0, R]].forEach(a => {
+        const p1 = P(a[0], 0, a[1]), p2 = P(a[2], 0, a[3]);
+        if (p1 && p2) { ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke(); }
+      });
+      ctx.globalAlpha = 1;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const n = P(0, 0, -R * 1.2);
+      if (n) { ctx.font = '700 16px ' + FONT; ctx.fillStyle = pal.ink2; ctx.fillText('N', n[0], n[1]); }
+      ctx.font = '700 13px ' + FONT; ctx.fillStyle = pal.ink3;
+      [0.5, 1].forEach(f => { const p = P(R * f * 0.72, 0, R * f * 0.72); if (p) ctx.fillText(C.fmtKm(S.radius * f), p[0] + 16, p[1] + 2); });
+    }
+    let sweepA = 0;
+    function drawSweep(dt, anim) {
+      if (anim) sweepA -= dt * 1.1;
+      const pts = [P(0, 0.01, 0)];
+      for (let i = 0; i <= 16; i++) { const a = sweepA + i / 16 * 0.6; pts.push(P(Math.cos(a) * R, 0.01, Math.sin(a) * R)); }
+      if (pts.some(q => !q)) return;
+      path(pts); ctx.fillStyle = `rgba(${pal.sign.join(',')},0.13)`; ctx.fill();
+    }
+    function drawPillar(it) {
+      const w = 0.24, h = Math.max(0.02, it.h * it.cur), x = it.x, z = it.z, base = pal[it.status] || pal.noprice;
+      const b = [[x - w, z - w], [x + w, z - w], [x + w, z + w], [x - w, z + w]];
+      const pb = b.map(c => P(c[0], 0, c[1])), pt = b.map(c => P(c[0], h, c[1]));
+      if (pb.some(q => !q) || pt.some(q => !q)) return;
+      [[0, 1, 0, -1], [1, 2, 1, 0], [2, 3, 0, 1], [3, 0, -1, 0]].forEach(([i, j, nx, nz]) => {
+        const fx = (b[i][0] + b[j][0]) / 2, fz = (b[i][1] + b[j][1]) / 2;
+        if (nx * (cam.C[0] - fx) + nz * (cam.C[2] - fz) <= 0) return;
+        path([pb[i], pb[j], pt[j], pt[i]]);
+        ctx.fillStyle = shade(base, 0.74 + 0.26 * Math.max(0, nx * LIGHT[0] + nz * LIGHT[2])); ctx.fill();
+      });
+      path(pt); ctx.fillStyle = shade(base, 1.25); ctx.fill();
+      if (it.id === selectedId) { ctx.lineWidth = 2; ctx.strokeStyle = pal.ink; ctx.stroke(); }
+    }
+    function drawYou(t, anim) {
+      const p = P(0, 0, 0);
+      if (!p) return;
+      const k = anim ? ((t / 1000) % 1.8) / 1.8 : 0.3, c = pal.sign.join(',');
+      ctx.beginPath(); ctx.arc(p[0], p[1], 9 + k * 24, 0, Math.PI * 2); ctx.fillStyle = `rgba(${c},${(0.3 * (1 - k)).toFixed(3)})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(p[0], p[1], 9, 0, Math.PI * 2); ctx.fillStyle = pal.surface; ctx.fill();
+      ctx.beginPath(); ctx.arc(p[0], p[1], 6.5, 0, Math.PI * 2); ctx.fillStyle = `rgb(${c})`; ctx.fill();
+    }
+    function labelBox(it) {
+      const p = P(it.x, it.h * it.cur + 0.3, it.z);
+      if (!p) return null;
+      const txt = it.price != null ? C.fmtPrice3(it.price) + ' €' : it.status === 'dry' ? 'À sec' : '—';
+      ctx.font = '700 14px ' + FONT;
+      const w = ctx.measureText(txt).width + 16, h = 24;
+      return { it, p, txt, w, h, x: p[0] - w / 2, y: p[1] - h - 7 };
+    }
+    function drawLabel(b) {
+      const it = b.it, p = b.p, w = b.w, h = b.h, x = b.x, y = b.y, hi = it.top >= 0;
+      const bg = hi ? pal.signal : pal.surface, fg = hi ? '#171300' : pal.ink;
+      ctx.save(); ctx.shadowColor = 'rgba(5,12,30,.25)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 2;
+      rr(x, y, w, h, 7); ctx.fillStyle = bg; ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.moveTo(p[0] - 5, y + h - 0.5); ctx.lineTo(p[0], y + h + 5); ctx.lineTo(p[0] + 5, y + h - 0.5); ctx.closePath();
+      ctx.fillStyle = bg; ctx.fill();
+      ctx.font = '700 14px ' + FONT; ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(b.txt, p[0], y + h / 2 + 0.5);
+    }
+
+    function frame(t) {
+      raf = 0;
+      if (!active || !ready || !visible || document.hidden || !W) return;
+      const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+      lastT = t;
+      const anim = !reduced();
+      if (anim && pointers.size === 0 && t - lastInteract > 4000) az += dt * 0.06;
+      let intro = false;
+      if (introStart) {
+        const k = Math.min(1, (t - introStart) / 1500), e = easeOut(k);
+        phi = 1.38 + (tPhi - 1.38) * e; zf = 1.3 + (zoom - 1.3) * e;
+        if (k >= 1) introStart = 0; else intro = true;
+      } else {
+        const ease = Math.min(1, dt * 6);
+        phi += (tPhi - phi) * ease; zf += (zoom - zf) * ease;
+      }
+      cam = makeCam();
+      ctx.clearRect(0, 0, W, H);
+      drawGround();
+      drawSweep(dt, anim);
+      let growing = false;
+      items.forEach(it => {
+        if (it.done) return;
+        const p = clamp((t - growStart - it.delay) / 650, 0, 1);
+        it.cur = p >= 1 ? 1 : easeOutBack(p);
+        if (p >= 1) it.done = true; else growing = true;
+      });
+      const sel = items.filter(it => it.id === selectedId)[0];
+      if (sel) { path(ring(sel.x, sel.z, 0.62, 32)); ctx.strokeStyle = pal.signal; ctx.lineWidth = 2.6; ctx.stroke(); }
+      const depth = it => Math.hypot(it.x - cam.C[0], it.z - cam.C[2]);
+      const youD = Math.hypot(cam.C[0], cam.C[2]);
+      let youDone = false;
+      items.slice().sort((a, b) => depth(b) - depth(a)).forEach(it => {
+        if (!youDone && depth(it) < youD) { drawYou(t, anim); youDone = true; }
+        drawPillar(it);
+      });
+      if (!youDone) drawYou(t, anim);
+      const prio = it => (it.id === selectedId ? -1 : it.top);
+      const kept = [];
+      items.filter(it => it.top >= 0 || it.id === selectedId).sort((a, b) => prio(a) - prio(b)).forEach(it => {
+        const b = labelBox(it);
+        if (b && !kept.some(k => b.x < k.x + k.w + 4 && k.x < b.x + b.w + 4 && b.y < k.y + k.h + 4 && k.y < b.y + b.h + 4)) kept.push(b);
+      });
+      kept.sort((a, b) => depth(b.it) - depth(a.it)).forEach(drawLabel);
+      const settling = Math.abs(tPhi - phi) > 0.002 || Math.abs(zoom - zf) > 0.002;
+      if (anim || growing || settling || intro || pointers.size) raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (active && ready && !raf) { lastT = 0; raf = requestAnimationFrame(frame); } }
+
+    function select(id) {
+      selectedId = id || null;
+      const it = selectedId && items.filter(x => x.id === selectedId)[0];
+      $('#radarPick').innerHTML = it ? pickHTML(it.row) : '';
+      kick();
+    }
+    function pickAt(clientX, clientY) {
+      if (!cam) return;
+      const rect = cv.getBoundingClientRect(), x = clientX - rect.left, y = clientY - rect.top;
+      let best = null, bd = 30;
+      items.forEach(it => {
+        const p = P(it.x, it.h * it.cur * 0.6, it.z);
+        if (!p) return;
+        const d = Math.hypot(p[0] - x, p[1] - y);
+        if (d < bd) { bd = d; best = it; }
+      });
+      select(best ? best.id : null);
+    }
+    const pinchDist = () => { const a = Array.from(pointers.values()); return a.length < 2 ? 0 : Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); };
+    function bindInput() {
+      cv.addEventListener('pointerdown', e => {
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        try { cv.setPointerCapture(e.pointerId); } catch (x) { /* pas de capture */ }
+        if (pointers.size === 1) moved = 0;
+        if (pointers.size === 2) { pinch0 = pinchDist(); z0 = zoom; }
+        lastInteract = performance.now(); introStart = 0; kick();
+      });
+      cv.addEventListener('pointermove', e => {
+        const p = pointers.get(e.pointerId);
+        if (!p) return;
+        const dx = e.clientX - p.x, dy = e.clientY - p.y;
+        p.x = e.clientX; p.y = e.clientY;
+        if (pointers.size === 1) {
+          az -= dx * 0.0095; moved += Math.abs(dx) + Math.abs(dy);
+          if (e.pointerType === 'mouse') tPhi = clamp(tPhi + dy * 0.006, 0.35, 1.42);
+        } else if (pointers.size === 2 && pinch0) {
+          zoom = clamp(z0 * pinch0 / Math.max(1, pinchDist()), 0.45, 1.4); moved += 20;
+        }
+        lastInteract = performance.now(); kick();
+      });
+      const end = e => {
+        const tap = e.type === 'pointerup' && pointers.size === 1 && moved < 8 && pointers.has(e.pointerId);
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) pinch0 = 0;
+        if (tap) pickAt(e.clientX, e.clientY);
+        lastInteract = performance.now();
+      };
+      cv.addEventListener('pointerup', end);
+      cv.addEventListener('pointercancel', end);
+      cv.addEventListener('wheel', e => { e.preventDefault(); zoom = clamp(zoom * (e.deltaY > 0 ? 1.08 : 0.92), 0.45, 1.4); lastInteract = performance.now(); kick(); }, { passive: false });
+    }
+
+    return {
+      show() {
+        active = true;
+        if (!ready && !init()) return;
+        resize();
+        if (!introDone) { introDone = true; if (!reduced()) introStart = performance.now(); }
+        setData(S.view);
+      },
+      hide() { active = false; if (raf) cancelAnimationFrame(raf); raf = 0; },
+      update(view) { if (active && ready) setData(view); },
+      select(id) { if (ready) select(id); else selectedId = id || null; },
+      resume() { kick(); },
+      retheme() { if (ready) { readPalette(); kick(); } },
+      control(a) {
+        if (a === 'in') zoom = clamp(zoom * 0.8, 0.45, 1.4);
+        else if (a === 'out') zoom = clamp(zoom * 1.25, 0.45, 1.4);
+        else if (a === 'view') tPhi = tPhi > 1.2 ? 0.92 : 1.42;
+        else if (a === 'reset') { az = 0.62; zoom = 1; tPhi = 0.92; select(null); }
+        lastInteract = performance.now(); kick();
+      }
+    };
+  })();
+
+  function pickHTML(r) {
+    const now = Date.now();
+    const price = r.price != null ? `<span class="pp num">${C.fmtPrice3(r.price)}</span>` : '';
+    return `<div class="pick"><div><b>${esc(C.stationTitle(r.st))}</b><span>${esc([C.stationPlace(r.st), C.fmtKm(r.dist)].filter(Boolean).join(' · '))}</span><span class="tags">${statusPill(r, now)}</span></div>${price}<button type="button" class="btn small primary" data-open-st="${esc(r.st.id)}">Voir la fiche</button></div>`;
+  }
+
+  /* =====================================================================
+     COMMUNAUTÉ : chat + signalements par station
+     - dans l'aperçu Claude : base de données de l'artefact
+     - en ligne : canal public ntfy.sh (aucun compte requis)
+     ===================================================================== */
+  const REPORT_LABEL = { ok: ['ok', 'Il y en a'], dry: ['bad', 'À sec'], wait: ['warn', 'Grosse attente'] };
+  const CHAT_TEXT = {
+    connecting: 'Connexion…', reconnecting: 'Reconnexion…', slow: 'Le chat met du temps à répondre…',
+    error: 'Chat indisponible pour le moment', unavailable: 'Chat indisponible dans cet aperçu'
+  };
+
+  function setChatState(s) { S.chat.state = s; renderChatState(); renderComposer(); }
+  function renderChatState() {
+    const el = $('#chatState'), s = S.chat.state, kind = S.chat.backend && S.chat.backend.kind;
+    el.dataset.s = s;
+    let txt = CHAT_TEXT[s] || '';
+    if (s === 'live') txt = S.chat.readOnly ? 'Lecture seule dans l’aperçu' : kind === 'db' ? 'En direct · aperçu Claude' : kind === 'local' ? 'Mode démo' : 'En direct · messages publics';
+    $('span', el).textContent = txt;
+    $('#chatFine').textContent = kind === 'db'
+      ? 'Aperçu : seuls toi et les éditeurs de cette page pouvez écrire ici. Une fois en ligne, tous les visiteurs participent.'
+      : kind === 'local' ? 'Mode démo : tes messages restent sur cet appareil.'
+      : 'Messages publics, visibles quelques heures. Ne partage pas d’informations personnelles.';
+  }
+  function renderBadge() {
+    const b = $('#chatBadge');
+    b.hidden = !S.unread; b.textContent = S.unread > 9 ? '9+' : String(S.unread);
+  }
+
+  let whoKey = '';
+  function renderComposer(force) {
+    const can = !!S.chat.backend && !S.chat.readOnly && ['live', 'reconnecting', 'slow'].indexOf(S.chat.state) >= 0;
+    $('#msgInput').disabled = !can; $('#sendBtn').disabled = !can;
+    const key = [S.pseudo, S.editPseudo, can, S.attach ? S.attach.id : ''].join('|');
+    if (key === whoKey && !force) return;
+    whoKey = key;
+    const who = $('#who'), att = $('#attach');
+    if (!S.pseudo || S.editPseudo) {
+      who.innerHTML = `<label class="vh" for="pseudoInput">Ton pseudo</label><input id="pseudoInput" maxlength="24" value="${esc(S.pseudo)}" placeholder="Choisis un pseudo (ex. Sam_69)"><button type="button" class="btn small" data-act="setpseudo">OK</button>`;
+    } else {
+      who.innerHTML = `${icon('chat')}<span>Tu écris en tant que <b>${esc(S.pseudo)}</b></span> · <button type="button" class="link" data-act="editpseudo">changer</button>`;
+    }
+    if (S.attach) {
+      att.hidden = false;
+      att.innerHTML = `<span>À propos de</span><span class="stag">${icon('pin')}<span>${esc(C.stationTitle(S.attach))}</span></span><button type="button" class="icon-btn" data-act="unattach" aria-label="Ne plus lier cette station">${icon('close')}</button>` +
+        `<div class="quick">${['Livraison en cours', 'Grosse file d’attente', 'Automate en panne', 'Prix affiché différent'].map(q => `<button type="button" data-quick="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+      att.style.flexWrap = 'wrap';
+    } else { att.hidden = true; att.innerHTML = ''; }
+  }
+
+  function msgHTML(m, now) {
+    const mine = S.mine.has(m.mid) || (S.chat.uid && m.uid === S.chat.uid);
+    if (S.hiddenMsgs.has(m.mid)) return `<li class="msg hidden"><div class="bubble"><button type="button" data-unhide="${esc(m.mid)}">Message masqué · afficher</button></div></li>`;
+    const l = m.k === 'report' && m.s ? REPORT_LABEL[m.s] : null;
+    const rep = l ? `<span class="pill ${l[0]}">${l[1]}${m.f ? ' · ' + esc(FUEL[m.f].name) : ''}</span>` : '';
+    const tag = m.sid ? `<button type="button" class="stag" data-sid="${esc(m.sid)}">${icon('pin')}<span>${esc(m.sn || 'Station')}</span></button>` : '';
+    const st = m.pending ? '<span class="mstate">Envoi…</span>' : m.failed ? `<button type="button" class="mstate err" data-retry="${esc(m.mid)}">Non envoyé · réessayer</button>` : '';
+    const hide = mine ? '' : `<button type="button" class="mini" data-hide="${esc(m.mid)}" aria-label="Masquer ce message">${icon('eyeoff')}</button>`;
+    return `<li class="msg${mine ? ' mine' : ''}"><div class="bubble"><div class="meta"><b>${esc(m.p)}</b><span>· ${C.fmtAgo(m.at, now)}</span>${hide}</div>${rep}${m.t ? `<p>${esc(m.t)}</p>` : ''}${tag}${st}</div></li>`;
+  }
+
+  function renderChat(scrollDown) {
+    renderChatState(); renderComposer();
+    if (S.tab !== 'chat') return;
+    $$('#chatFilter [data-cf]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.cf === S.chatFilter)));
+    const nearBottom = window.innerHeight + window.scrollY > document.documentElement.scrollHeight - 160;
+    const now = Date.now();
+    let list = Array.from(S.msgs.values()).sort((a, b) => a.at - b.at);
+    if (S.chatFilter === 'near' && S.place) list = list.filter(m => m.la != null && m.lo != null && C.km(S.place, { lat: m.la, lon: m.lo }) <= S.radius + 15);
+    const ol = $('#msgs');
+    if (!list.length) {
+      const waiting = S.chat.state === 'connecting';
+      ol.innerHTML = `<li class="empty"><h3>${waiting ? 'Connexion au chat…' : S.chatFilter === 'near' ? 'Rien près de toi pour l’instant' : 'Aucun message pour l’instant'}</h3><p>Ouvre la fiche d’une station pour dire s’il reste du carburant, ou écris aux conducteurs du coin.</p>${S.chatFilter === 'near' && S.msgs.size ? '<button type="button" class="btn" data-act="allmsgs">Voir tous les messages</button>' : ''}</li>`;
+    } else {
+      ol.innerHTML = list.slice(-150).map(m => msgHTML(m, now)).join('');
+    }
+    if (scrollDown || nearBottom) requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'auto' }));
+  }
+
+  /* intégration des messages reçus (déjà nettoyés) */
+  function ingest(list, replace) {
+    let fresh = 0;
+    const isFresh = m => m.at > S.chatSince && !S.mine.has(m.mid) && !S.msgs.has(m.mid);
+    if (replace) {
+      const next = new Map();
+      list.forEach(m => { if (isFresh(m)) fresh++; next.set(m.mid, m); });
+      S.msgs.forEach((m, k) => { if ((m.pending || m.failed) && !next.has(k)) next.set(k, m); });
+      S.msgs = next;
+    } else {
+      list.forEach(m => { if (isFresh(m)) fresh++; S.msgs.set(m.mid, m); });
+    }
+    if (S.msgs.size > 400) {
+      const keep = Array.from(S.msgs.values()).sort((a, b) => b.at - a.at).slice(0, 300);
+      S.msgs = new Map(keep.map(m => [m.mid, m]));
+    }
+    if (fresh && S.tab !== 'chat') { S.unread += fresh; renderBadge(); }
+    scheduleComm();
+  }
+  let commTimer = 0;
+  function scheduleComm() {
+    clearTimeout(commTimer);
+    commTimer = setTimeout(() => {
+      S.comm = C.buildCommIndex(Array.from(S.msgs.values()), Date.now());
+      recompute(); renderTotem(); renderStats(); renderList(false);
+      if (S.tab === 'radar') Radar.update(S.view);
+      if (S.tab === 'chat') renderChat();
+      if (S.sheet === 'station' && S.sheetStation) { const box = $('#shReports'); if (box) box.innerHTML = reportsHTML(S.sheetStation); }
+    }, 120);
+  }
+
+  function dbBackend(db) {
+    const col = db.collection('messages');
+    let pruned = false;
+    return {
+      kind: 'db',
+      start() {
+        const timer = setTimeout(() => { if (S.chat.state === 'connecting') setChatState('slow'); }, 10000);
+        col.orderBy('at', 'desc').limit(200).onSnapshot(snap => {
+          if (!snap.metadata || !snap.metadata.fromCache) clearTimeout(timer);
+          if (S.chat.state !== 'live') setChatState('live');
+          const now = Date.now(), list = [];
+          snap.docs.forEach(d => { const m = C.sanitizeMsg(d.data(), d.id, null, now); if (m) list.push(m); });
+          ingest(list, true);
+        }, err => {
+          clearTimeout(timer);
+          setChatState(err && err.code === 'revoked' ? 'unavailable' : 'error');
+        });
+      },
+      async send(m) {
+        const body = Object.assign({}, m);
+        if (S.chat.uid) body.uid = S.chat.uid;
+        try { await col.doc(m.mid).set(body); }
+        catch (e) {
+          if (e && e.code === 'unavailable') { await sleep(400 + Math.random() * 600); await col.doc(m.mid).set(body); }
+          else {
+            if (e && e.code === 'invalid_argument') { S.chat.readOnly = true; renderChatState(); renderComposer(true); }
+            throw e;
+          }
+        }
+        if (!pruned) {
+          pruned = true; // ménage : on supprime les messages de plus de 2 jours
+          try {
+            const old = await col.where('at', '<', Date.now() - 2 * DAY).limit(25).get();
+            for (const d of old.docs) { try { await col.doc(d.id).delete(); } catch (e) { break; } }
+          } catch (e) { /* pas grave */ }
+        }
+      }
+    };
+  }
+
+  function ntfyBackend(topic) {
+    const base = NTFY + encodeURIComponent(topic);
+    function handle(raw) {
+      let e, o;
+      try { e = JSON.parse(raw); } catch (x) { return; }
+      if (!e || e.event !== 'message' || typeof e.message !== 'string') return;
+      try { o = JSON.parse(e.message); } catch (x) { return; }
+      const m = C.sanitizeMsg(o, e.id, e.time, Date.now());
+      if (m) ingest([m], false);
+    }
+    async function poll() {
+      try {
+        const res = await fetchT(base + '/json?poll=1&since=12h', 15000);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        (await res.text()).split('\n').forEach(l => { if (l.trim()) handle(l); });
+        if (S.chat.state !== 'live') setChatState('live');
+      } catch (e) { setChatState('error'); }
+    }
+    return {
+      kind: 'ntfy',
+      start() {
+        if ('EventSource' in window) {
+          try {
+            const es = new EventSource(base + '/sse?since=12h');
+            es.onopen = () => setChatState('live');
+            es.onmessage = ev => handle(ev.data);
+            es.onerror = () => setChatState(es.readyState === 2 ? 'error' : 'reconnecting');
+            return;
+          } catch (e) { /* repli sur l'interrogation régulière */ }
+        }
+        poll(); setInterval(poll, 30000);
+      },
+      async send(m) {
+        const res = await fetchT(base, 15000, { method: 'POST', body: JSON.stringify(m) });
+        if (res.status === 429) { const e = new Error('rate'); e.code = 'rate'; throw e; }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+      }
+    };
+  }
+
+  function localBackend() {
+    return {
+      kind: 'local',
+      start() { setChatState('live'); },
+      async send(m) { await sleep(250); const x = C.sanitizeMsg(m, m.mid, Date.now(), Date.now()); if (x) ingest([x], false); }
+    };
+  }
+
+  async function initChat() {
+    renderChatState();
+    if (FORCE_DEMO) {
+      S.chat.backend = localBackend();
+    } else if (IN_CLAUDE) {
+      let db = null, user = null;
+      try { db = await window.claude.use('db'); } catch (e) { db = null; }
+      if (!db) { setChatState('unavailable'); return; }
+      try { user = await window.claude.use('user'); } catch (e) { user = null; }
+      if (user) {
+        try { S.chat.uid = await user.id(); } catch (e) { /* sans identifiant */ }
+        try { if ((await user.can('data.write')) === false) S.chat.readOnly = true; } catch (e) { /* on laisse le serveur décider */ }
+      }
+      S.chat.backend = dbBackend(db);
+    } else {
+      S.chat.backend = ntfyBackend(CHAT_TOPIC);
+    }
+    S.chat.backend.start();
+    renderChatState(); renderComposer(true);
+  }
+
+  async function sendMessage(o) {
+    const be = S.chat.backend;
+    if (!be) { toast('Le chat n’est pas disponible pour le moment.'); return false; }
+    if (S.chat.readOnly) { toast('Dans l’aperçu, seuls le propriétaire et les éditeurs écrivent. En ligne, tout le monde peut participer.'); return false; }
+    const now = Date.now();
+    if (now - S.lastSend < 5000) { toast('Attends quelques secondes entre deux messages.'); return false; }
+    const st = o.station || null;
+    const m = {
+      app: 'essencedispo', v: 1, mid: newId(), t: (o.text || '').slice(0, 280), p: S.pseudo || 'Anonyme', at: now,
+      k: o.kind || 'msg', s: o.status || null, sid: st ? st.id : null,
+      sn: st ? C.stationTitle(st) + (st.ville ? ', ' + st.ville : '') : null, f: o.fuel || null,
+      la: st ? round(st.lat, 4) : (S.place ? round(S.place.lat, 1) : null),
+      lo: st ? round(st.lon, 4) : (S.place ? round(S.place.lon, 1) : null)
+    };
+    S.lastSend = now;
+    S.mine.add(m.mid); store.set('mine', Array.from(S.mine).slice(-200));
+    const local = C.sanitizeMsg(m, m.mid, now, now);
+    local.pending = true;
+    ingest([local], false);
+    try {
+      await be.send(m);
+      const cur = S.msgs.get(m.mid);
+      if (cur && cur.pending) { S.msgs.set(m.mid, Object.assign({}, cur, { pending: false })); scheduleComm(); }
+      return true;
+    } catch (e) {
+      const cur = S.msgs.get(m.mid);
+      if (cur) { S.msgs.set(m.mid, Object.assign({}, cur, { pending: false, failed: true, raw: o })); scheduleComm(); }
+      toast(e && e.code === 'rate' ? 'Trop de messages d’un coup. Réessaie dans une minute.' : 'Message non envoyé. Vérifie ta connexion et réessaie.');
+      return false;
+    }
+  }
+
+  async function report(status) {
+    const st = S.sheetStation;
+    if (!st) return;
+    const F = FUEL[S.fuel];
+    const ok = await sendMessage({ kind: 'report', status, station: st, fuel: S.fuel, text: '' });
+    if (ok) toast(status === 'dry' ? `Merci ! Signalé : plus de ${F.name} ici.` : status === 'ok' ? `Merci ! Signalé : il y a du ${F.name}.` : 'Merci ! Attente signalée.');
+  }
+
+  function setPseudoFrom(input) {
+    const v = (input && input.value || '').replace(/\s+/g, ' ').trim().slice(0, 24);
+    if (!v) { toast('Choisis un pseudo pour écrire dans le chat.'); if (input) input.focus(); return false; }
+    S.pseudo = v; S.editPseudo = false; savePrefs(); renderComposer(true);
+    $('#msgInput').focus();
+    return true;
+  }
+
+  /* ---------- toast ---------- */
+  let toastTimer = 0;
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg; el.hidden = false;
+    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, 3800);
+  }
+
+  /* =====================================================================
+     ÉVÉNEMENTS
+     ===================================================================== */
+  let sugTimer = 0, sugSeq = 0, sugItems = [], sugIndex = -1;
+  function hideSug() {
+    const ul = $('#suggest');
+    ul.hidden = true; ul.innerHTML = ''; sugItems = []; sugIndex = -1;
+    const inp = $('#searchInput');
+    inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant');
+  }
+  function renderSug() {
+    const ul = $('#suggest'), inp = $('#searchInput');
+    if (!sugItems.length) { hideSug(); return; }
+    ul.innerHTML = sugItems.map((s, i) => `<li role="option" id="sug-${i}" data-i="${i}" aria-selected="${i === sugIndex}">${esc(s.label)}${s.context ? `<small>${esc(s.context)}</small>` : ''}</li>`).join('');
+    ul.hidden = false;
+    inp.setAttribute('aria-expanded', 'true');
+    if (sugIndex >= 0) inp.setAttribute('aria-activedescendant', 'sug-' + sugIndex); else inp.removeAttribute('aria-activedescendant');
+  }
+  function pickSug(s) {
+    const label = s.type === 'municipality' ? `${s.city || s.label}${s.postcode ? ' (' + s.postcode + ')' : ''}` : s.label;
+    $('#searchInput').value = ''; $('#searchInput').blur(); hideSug();
+    setPlace({ lat: s.lat, lon: s.lon, label, source: 'search', cp: s.postcode || '' });
+  }
+
+  function bindEvents() {
+    $('#fuelBar').addEventListener('click', e => { const b = e.target.closest('[data-fuel]'); if (b) setFuel(b.dataset.fuel); });
+    $('#fuelBar').addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const i = FUELS.findIndex(F => F.key === S.fuel), n = FUELS[(i + (e.key === 'ArrowRight' ? 1 : FUELS.length - 1)) % FUELS.length];
+      setFuel(n.key); const b = $(`[data-fuel="${n.key}"]`); if (b) b.focus(); e.preventDefault();
+    });
+    $('#sortCtl').addEventListener('click', e => {
+      const b = e.target.closest('[data-sort]');
+      if (b && b.dataset.sort !== S.sort) { S.sort = b.dataset.sort; savePrefs(); renderAll({ animate: true }); }
+    });
+    $('#favToggle').addEventListener('click', () => { S.favOnly = !S.favOnly; renderAll({ animate: true }); });
+    $('#moreBtn').addEventListener('click', () => { S.showCount += 30; renderList(false); });
+    $('#radiusSel').addEventListener('change', e => setRadius(parseInt(e.target.value, 10)));
+    $('#gpsBtn').addEventListener('click', () => locate(false));
+    $('#settingsBtn').addEventListener('click', () => openSheet('settings', settingsSheet()));
+    $('#liveBtn').addEventListener('click', () => {
+      if (S.mode === 'demo') { if (IN_CLAUDE) openSheet('help', helpSheet()); else toast('Mode démo : stations et prix d’exemple.'); }
+      else if (!S.loading) refresh();
+    });
+    $('#totem').addEventListener('click', () => { if (S.view && S.view.best) openStation(S.view.best.st.id); });
+    $('#backdrop').addEventListener('click', closeSheet);
+    $('#sheet').addEventListener('change', onSettingsInput);
+    $('#sheet').addEventListener('input', e => { if (e.target.id === 'setPseudo') onSettingsInput(e); });
+
+    /* inclinaison du totem à la souris */
+    const hero = $('.hero'), tilt = $('#totemTilt');
+    hero.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || reduced()) return;
+      const r = tilt.getBoundingClientRect();
+      const x = clamp((e.clientX - (r.left + r.width / 2)) / r.width, -1, 1), y = clamp((e.clientY - (r.top + r.height / 2)) / r.height, -1, 1);
+      tilt.style.transform = `rotateY(${(x * 10).toFixed(2)}deg) rotateX(${(-y * 8).toFixed(2)}deg)`;
+    });
+    hero.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
+
+    /* onglets */
+    TABS.forEach(n => $('#tab-' + n).addEventListener('click', () => setTab(n)));
+    $('.tabs').addEventListener('keydown', e => {
+      const i = TABS.indexOf(S.tab);
+      if (e.key === 'ArrowRight') { setTab(TABS[(i + 1) % 3], true); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { setTab(TABS[(i + 2) % 3], true); e.preventDefault(); }
+    });
+    $$('[data-radar]').forEach(b => b.addEventListener('click', () => Radar.control(b.dataset.radar)));
+
+    /* recherche avec suggestions */
+    const inp = $('#searchInput');
+    inp.addEventListener('input', () => {
+      clearTimeout(sugTimer);
+      const q = inp.value.trim();
+      if (q.length < 3 || S.mode === 'demo') { hideSug(); return; }
+      sugTimer = setTimeout(async () => {
+        const seq = ++sugSeq, res = await geocode(q, 5);
+        if (seq !== sugSeq || inp.value.trim() !== q) return;
+        sugItems = res || []; sugIndex = -1; renderSug();
+      }, 260);
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' && sugItems.length) { sugIndex = (sugIndex + 1) % sugItems.length; renderSug(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp' && sugItems.length) { sugIndex = (sugIndex - 1 + sugItems.length) % sugItems.length; renderSug(); e.preventDefault(); }
+      else if (e.key === 'Escape') hideSug();
+    });
+    inp.addEventListener('blur', () => setTimeout(hideSug, 180));
+    $('#suggest').addEventListener('pointerdown', e => {
+      const li = e.target.closest('[data-i]');
+      if (li) { e.preventDefault(); pickSug(sugItems[+li.dataset.i]); }
+    });
+    $('#searchForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const q = inp.value.trim();
+      if (S.mode === 'demo') { toast(IN_CLAUDE ? 'La recherche marche dans la version en ligne. Ici, l’aperçu montre Démoville.' : 'La recherche est désactivée en mode démo.'); return; }
+      if (sugIndex >= 0 && sugItems[sugIndex]) { pickSug(sugItems[sugIndex]); return; }
+      if (q.length < 2) return;
+      const res = await geocode(q, 1);
+      if (res && res[0]) pickSug(res[0]);
+      else toast(res ? 'Adresse introuvable. Essaie une ville ou un code postal.' : 'Recherche impossible pour l’instant. Vérifie ta connexion.');
+    });
+
+    /* chat */
+    $('#chatFilter').addEventListener('click', e => { const b = e.target.closest('[data-cf]'); if (b) { S.chatFilter = b.dataset.cf; renderChat(); } });
+    $('#composer').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (document.activeElement && document.activeElement.id === 'pseudoInput') { setPseudoFrom(document.activeElement); return; }
+      const input = $('#msgInput'), text = input.value.replace(/\s+/g, ' ').trim();
+      if (!text) return;
+      if (!S.pseudo) { const pi = $('#pseudoInput'); toast('Choisis d’abord un pseudo.'); if (pi) pi.focus(); return; }
+      $('#sendBtn').disabled = true;
+      const ok = await sendMessage({ kind: 'msg', text, station: S.attach });
+      renderComposer(true);
+      if (ok) { input.value = ''; S.attach = null; renderComposer(true); }
+    });
+
+    /* délégation générale */
+    document.addEventListener('click', e => {
+      const t = e.target.closest('[data-close],[data-open],[data-act],[data-id],[data-open-st],[data-rep],[data-sid],[data-hide],[data-unhide],[data-retry],[data-radius],[data-quick]');
+      if (!t) return;
+      const d = t.dataset;
+      if (d.close !== undefined) { closeSheet(); return; }
+      if (d.open === 'settings') { openSheet('settings', settingsSheet()); return; }
+      if (d.open === 'help') { openSheet('help', helpSheet()); return; }
+      if (d.id && t.classList.contains('st')) { openStation(d.id); return; }
+      if (d.openSt) { openStation(d.openSt); return; }
+      if (d.rep) { report(d.rep); return; }
+      if (d.sid) { openStation(d.sid); return; }
+      if (d.hide) { S.hiddenMsgs.add(d.hide); store.set('hidden', Array.from(S.hiddenMsgs).slice(-300)); renderChat(); return; }
+      if (d.unhide) { S.hiddenMsgs.delete(d.unhide); store.set('hidden', Array.from(S.hiddenMsgs)); renderChat(); return; }
+      if (d.retry) {
+        const m = S.msgs.get(d.retry);
+        if (m) { S.msgs.delete(d.retry); $('#msgInput').value = m.t || ''; renderChat(); $('#msgInput').focus(); }
+        return;
+      }
+      if (d.radius) {
+        setRadius(parseInt(d.radius, 10));
+        $$('#sheet [data-radius]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.radius === d.radius)));
+        return;
+      }
+      if (d.quick) { const i = $('#msgInput'); i.value = d.quick; i.focus(); return; }
+      switch (d.act) {
+        case 'retry': refresh(); break;
+        case 'favoff': S.favOnly = false; renderAll({ animate: true }); break;
+        case 'showdry': S.hideDry = false; savePrefs(); renderAll({ animate: true }); break;
+        case 'widen': setRadius(parseInt(d.r, 10)); break;
+        case 'allmsgs': S.chatFilter = 'all'; renderChat(); break;
+        case 'nav': {
+          const n = $('#navs'); n.hidden = !n.hidden; t.setAttribute('aria-expanded', String(!n.hidden)); break;
+        }
+        case 'fav': if (S.sheetStation) toggleFav(S.sheetStation); break;
+        case 'share': if (S.sheetStation) shareStation(S.sheetStation); break;
+        case 'talk': S.attach = S.sheetStation; closeSheet(); setTab('chat'); renderComposer(true); setTimeout(() => $('#msgInput').focus(), 250); break;
+        case 'unattach': S.attach = null; renderComposer(true); break;
+        case 'setpseudo': setPseudoFrom($('#pseudoInput')); break;
+        case 'editpseudo': S.editPseudo = true; renderComposer(true); { const pi = $('#pseudoInput'); if (pi) pi.focus(); } break;
+        case 'reset':
+          if (t.dataset.armed) {
+            ['prefs', 'favs', 'hidden', 'mine', 'place', 'cache'].forEach(store.del);
+            S.favs = new Set(); S.hiddenMsgs = new Set(); S.pseudo = ''; S.favOnly = false;
+            closeSheet(); toast('Données effacées de cet appareil.'); renderAll(); renderComposer(true);
+          } else { t.dataset.armed = '1'; t.textContent = 'Touche encore pour confirmer'; t.classList.add('yellow'); }
+          break;
+        default: break;
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && S.sheet) closeSheet();
+      if (e.key === 'Tab' && S.sheet) { // garder le focus dans la fiche
+        const f = $$('#sheet button:not([disabled]), #sheet a[href], #sheet input, #sheet [tabindex]:not([tabindex="-1"])').filter(x => x.offsetParent !== null);
+        if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { f[f.length - 1].focus(); e.preventDefault(); }
+        else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { f[0].focus(); e.preventDefault(); }
+      }
+    });
+
+    /* thème, visibilité, actualisation automatique */
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', () => Radar.retheme()); else if (mq.addListener) mq.addListener(() => Radar.retheme());
+    new MutationObserver(() => Radar.retheme()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (S.mode === 'live' && !S.loading && Date.now() - S.fetchedAt > REFRESH_MS) refresh({ quiet: true });
+      Radar.resume();
+    });
+    setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      if (S.mode === 'live' && !S.loading && Date.now() - S.fetchedAt > REFRESH_MS) refresh({ quiet: true });
+      else { renderLive(); renderList(false); if (S.tab === 'chat') renderChat(); }
+    }, 60000);
+  }
+
+  /* =====================================================================
+     DÉMARRAGE
+     ===================================================================== */
+  function boot() {
+    loadPrefs();
+    buildLed();
+    bindEvents();
+    S.chatSince = Date.now();
+    if (FORCE_DEMO) { enterDemo(); initChat(); return; }
+    const saved = store.get('place', null);
+    const okSaved = saved && isFinite(saved.lat) && isFinite(saved.lon) && saved.source !== 'demo' && typeof saved.label === 'string';
+    S.place = okSaved ? saved : Object.assign({}, DEFAULT_PLACE);
+    const cache = !IN_CLAUDE && store.get('cache', null);
+    if (cache && cache.place && Array.isArray(cache.stations) && Date.now() - cache.at < 6 * HOUR && C.km(cache.place, S.place) < 0.05 && cache.radius >= S.radius) {
+      S.stations = cache.stations; S.fetchedAt = cache.at; S.mode = 'live';
+      S.fetchedFor = { lat: cache.place.lat, lon: cache.place.lon, radius: cache.radius };
+    }
+    renderAll({ animate: true });
+    refresh({ quiet: IN_CLAUDE });
+    if (!okSaved && !IN_CLAUDE) maybeAutoGps();
+    initChat();
+  }
+  boot();
+})();
+
+</script>
+</body>
+</html>
